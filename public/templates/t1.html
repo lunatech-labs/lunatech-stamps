@@ -1,0 +1,29 @@
+5{ foo = 2; }5
+
+4{foo + 2}4{foo % 2}
+
+3{if foo == 2}
+ <p>foo is two</p>
+3{/if}
+3{else}
+ <p>foo is not two</p>
+3{/else}
+
+3{if foo == 3}
+ <p>foo is three</p>
+3{/if}
+3{else}
+ <p>foo is not three</p>
+3{/else}
+
+<ul>
+3{list items:[1,2,3], var:'i' }
+ <li>item: 4{i}
+  <ul>
+  3{list items:[1,2,3], var:'j' }
+   <li>sub-item: 4{i*j}</li>
+  3{/list}
+  </ul>
+ </li>
+3{/list}
+</ul>

@@ -2,46 +2,105 @@ function Expression(expr){
 	this.expr = expr;
 }
 
+Expression.prototype = {
+	output: function(out){
+		// we're outputing the result of this expression
+		out(evalInEnv(this.expr, env));
+	}
+};
+
 function Code(code){
 	this.code = code;
 }
 
-function Tag(name){
+Code.prototype = {
+	output: function(out){
+		// extend the environment
+		env = env(this.code);
+	}
+};
+
+var env = eval(extendEnv("42"));
+
+function Tag(name, attributes){
 	this.name = name;
 	this.children = [];
+	this.attributes = attributes;
 }
 
 Tag.prototype = {
 	addChild: function(child){
 		this.children.push(child);
+	},
+	output: function(out, previousSibling){
+		// preserve environment
+		var parentEnv = env;
+		if(this.name == 'list'){
+			var l = evalInEnv(this.attributes.items, env);
+			var v = evalInEnv(this.attributes['var'], env);
+			for(var i = 0 ; i < l.length ; i++){
+				env = env(v+' = '+l[i]+';');
+				this.recursiveOutput(out);
+			}
+		}else if(this.name == 'if'){
+			this.testMatched = evalInEnv(this.attributes._arg, env);
+			console.log("if "+this.attributes._arg+" yielded "+this.testMatched);
+			if(this.testMatched)
+				this.recursiveOutput(out);
+		}else if(this.name == 'else'){
+			if(typeof previousSibling != 'Tag' && previousSibling.name != 'if')
+				throw "Invalid else: missing if";
+			if(!previousSibling.testMatched)
+				this.recursiveOutput(out);
+		}else
+			this.recursiveOutput(out);
+		// restore the environment
+		env = parentEnv;
+	},
+	recursiveOutput: function(out){
+		var lastChild;
+		for(var i=0;i<this.children.length;i++){
+			var child = this.children[i];
+			if(typeof child == 'string'){
+				out(child);
+				if(child.trim().length > 0)
+					lastChild = child;
+			}else{
+				child.output(out, lastChild);
+				lastChild = child;
+			}
+		}
 	}
 };
 
 var currentTag = new Tag('main');
 
-function processTemplates(){
- var node = document.documentElement;
- processNode(node);
+function loadTemplate(id, url){
+	jQuery.ajax({
+		method: 'GET',
+		url: url,
+		success: function(data){
+			processTemplates(id, data);
+		},
+		error: function(ouch){
+			alert(ouch);
+		}
+	});
 }
 
-function processNode(node){
- switch(node.nodeType){
-  case Node.ELEMENT_NODE:
-   //console.log('element: '+node.nodeName);
-   var nodes = node.childNodes;
-   for(var i=0;i<nodes.length;i++){
-    var child = nodes.item(i);
-    processNode(child); 
-   }
-   break;
-  case Node.TEXT_NODE:
-   processTextNode(node);
-   break;
- }
+function processTemplates(id, text){
+	parseTemplates(text);
+	if(currentTag.name != 'main')
+		throw "Bad current tag after parsing";
+	var data = '';
+	currentTag.output(function(part){
+		console.log('outputing '+part);
+		data += part;
+	});
+	jQuery('#'+id).html(data);
 }
 
-function processTextNode(node){
-	var text = node.nodeValue;
+function parseTemplates(text){
 	//console.log('text: '+text);
 	var openCode = undefined;
 	var openExpr = undefined;
@@ -121,14 +180,15 @@ function parseTag(tag){
 		ret.isEnd = true;
 		return ret;
 	}
-	var name = tag.match(/^([a-zA-Z0-9]+)[ \/]/)[1];
+	var name = tag.match(/^([a-zA-Z0-9]+)[ \/]?/)[1];
 	console.log('tag name: '+name);
-	tag = tag.substring(name.length);
+	tag = tag.substring(name.length).trim();
 	var isOpen = !tag.match(/\/$/);
 	if(!isOpen)
 		tag = tag.substring(0, tag.length-1);
 	var attributes = {};
 	var openStack = [];
+	var hasAttribute = false;
 	var attribute = undefined;
 	var valueStart = undefined;
 	var start = 0;
@@ -141,7 +201,8 @@ function parseTag(tag){
 			if(!valueStart)
 				throw "Invalid syntax: attribute name missing: "+tag;
 			// we are done!
-			attributes[attribute] = tag.substring(valueStart, i);
+			attributes[attribute] = tag.substring(valueStart, i).trim();
+			hasAttribute = true;
 			valueStart = undefined;
 			start = i+1;
 		}else if(c == '('){
@@ -160,30 +221,34 @@ function parseTag(tag){
 		}
 	}
 	if(valueStart){
-		// we still have some value left?
-		var value = tag.substring(valueStart);
+		// safety check
 		if(openStack.length != 0)
 			throw "Mismatched parent: forgot to close "+openStack.length+" parents";
+		// we still have some value left?
+		var value = tag.substring(valueStart).trim();
 		attributes[attribute] = value;
+	}else if(tag.length > 0 && !hasAttribute){
+		// safety check
+		if(openStack.length != 0)
+			throw "Mismatched parent: forgot to close "+openStack.length+" parents";
+		// we have no attributes and some content: it's the implicit argument
+		attributes._arg = tag;
 	}
 	//console.log(attributes);
-	var ret = new Tag(name);
+	var ret = new Tag(name, attributes);
 	ret.isOpen = isOpen;
-	ret.attributes = attributes;
 	return ret;
 }
 
-var ecount = 0;
-
-function evaler(){
-	var e = ecount++;
-	this.eval = function(___expr){
-		console.log('Evaluating in context '+e);
-		return eval(___expr);
-	};
+function extendEnv(e){ 
+	return "(function(){ "+e+"; return function(e){ return eval(extendEnv(e)); }})()"; 
 }
 
-evaler.prototype = {
-};
+var result;
 
-jQuery(processTemplates);
+function evalInEnv(expr, env){
+	env("result = "+expr);
+	return result;
+}
+
+
