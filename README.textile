@@ -18,3 +18,150 @@ h2. Procedural style
 	JSTemplates.loadTemplate("output", "/public/templates/t1.html");
 </script>
 </code></pre>
+
+h2. jQuery plugin style
+
+<pre><code>
+<div id="output2"></div>
+<script>
+	jQuery("#output2").jsTemplates("/public/templates/t1.html");
+</script>
+</code></pre>
+
+h2. Declarative style
+
+<pre><code>
+<div data-template="/public/templates/t1.html"></div>
+</code></pre>
+
+h2. Inline style
+
+<pre><code>
+<div data-jstemplate="inline">
+ <script type="text/html">
+  ...
+ </script>
+</div>
+</code></pre>
+
+h1. Writing templates
+
+h2. Statement blocks
+
+Write JS statements (to declare variables for example) like this:
+
+<pre><code>
+ !{ var foo = callthis(); }!
+</code></pre>
+
+h2. Expression blocks
+
+Write JS expressions to be inserted in the page like this:
+
+<pre><code>
+ ^{ foo > 2 ? foo + 23 : foo }
+</code></pre>
+
+h2. Tags
+
+Tags can either have a body:
+
+<pre><code>
+ ~{tag}...~{/tag}
+</code></pre>
+
+Or they can have no body:
+
+<pre><code>
+ ~{tag/}
+</code></pre>
+
+There are a number of defined tags, and you can write your own if you want.
+
+h3. If tag
+
+The @if@ tag allows you to write conditional templates:
+
+<pre><code>
+ ~{if foo == 42}Foo is the answer~{/if}
+</code></pre>
+
+The @else@ tag allows you to add a default condition to the @if@ tag:
+
+<pre><code>
+ ~{if foo == 42}Foo is the answer~{/if}
+ ~{else foo == 42}Foo is NOT the answer~{/else}
+</code></pre>
+
+h3. List tag
+
+The @list@ tag allows you to write iterative templates:
+
+<pre><code>
+ <ul>
+ ~{list items: [1,2,3], var: 'v'}
+  <li>Value of v is: ^{v}</li>
+ ~{/list}
+ </ul>
+</code></pre>
+
+h3. Writing your own tag
+
+You must define a subtype of @JSTemplates.Tag@, and register it for JSTemplates to find:
+
+<pre><code>
+// define our new tag type
+function HelloTag(name, attributes){
+	JSTemplates.Tag.apply(this, [name, attributes]);
+}
+// make sure it inherits methods from JSTemplates.Tag
+JSTemplates.extend(HelloTag, JSTemplates.Tag);
+
+// and implement its behaviour
+HelloTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	// when we do not name the attributes, the default is "_arg"
+	// we evaluate the contents of the attribute in the current environment
+	var string = env.evalExpression(this.attributes._arg);
+	// and we write it out
+	out('Hello ' + string);
+};
+
+// register this new tag in JSTemplates
+JSTemplates.declareTag('hello', HelloTag);
+</code></pre>
+
+You can now use this tag as such:
+
+<pre><code>
+~{hello 'World!' /}
+</code></pre>
+
+Which will produce @Hello World!@ :)
+
+h2. Futures
+
+When doing AJAX it's likely you'll have some templates that will depend on external data which you load using
+AJAX, which means it's going to be asynchronous.
+
+In JSTemplates we use _futures_ to describe values that might or might not yet be defined (because they could
+arrive later via AJAX). When a template tag encounters a value which is an instance of the type @JSTemplates.Future@, the current template tag evaluation is delayed until the _future_ instance is defined
+fully (when it receives its value from the network, for instance), and the current template is _partially_ evaluated,
+leaving gaps (actually, placeholders) where the template tags are waiting for _futures_.
+
+Once the _future_ instances are complete, the template processing is resumed with the _future_'s value and the
+placeholders are replaced with the evaluation of the delayed templates.
+
+This makes it very easy to define a complete page with _holes_ for the parts which rely on external data, without
+delaying the rendering of the rest of the templates.
+
+Note that at the moment only the @list@ tag deals with _futures_ for its @items@ attribute.
+
+You can define a _future_ which gets JSON data from an external source like this:
+
+<pre><code>
+ <ul>
+ ~{list items: new JSTemplates.Future("/data"), var: 'v'}
+  <li>Value of v is: ^{v}</li>
+ ~{/list}
+ </ul>
+</code></pre>
