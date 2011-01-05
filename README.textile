@@ -12,9 +12,9 @@ h1. Using templates
 
 h2. Procedural style
 
-```html
+<pre><code>
 <div id="output"></div>
 <script>
 	JSTemplates.loadTemplate("output", "/public/templates/t1.html");
 </script>
-```
+</code></pre>
