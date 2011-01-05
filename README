@@ -1,8 +1,8 @@
 Due to conflicts with Play! templates the tags are defined like this:
 
-- ~{tag /} or ~{tag}{/tag}
-- !{ JS statements }!
-- ^{ JS expressions inserted in the body }
+~{tag /} or ~{tag}{/tag}
+!{ JS statements }!
+^{ JS expressions inserted in the body }
 
 Use a JSTemplates.Future instance to delay evaluation (right now only supported in the list tag).
 
