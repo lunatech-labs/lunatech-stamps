@@ -1,0 +1,20 @@
+Due to conflicts with Play! templates the tags are defined like this:
+
+~{tag /} or ~{tag}{/tag}
+!{ JS statements }!
+^{ JS expressions inserted in the body }
+
+Use a JSTemplates.Future instance to delay evaluation (right now only supported in the list tag).
+
+See examples in /app/views/Application/index.html and /public/templates/t1.html
+
+h1. Using templates
+
+h2. Procedural style
+
+```html
+<div id="output"></div>
+<script>
+	JSTemplates.loadTemplate("output", "/public/templates/t1.html");
+</script>
+```
