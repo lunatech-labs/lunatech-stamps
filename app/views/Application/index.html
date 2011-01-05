@@ -1,7 +1,41 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 
+<!-- 
+ Due to conflicts with Play! templates the tags are defined like this:
+ ~{tag /} or ~{tag}{/tag}
+ !{ JS statements }!
+ ^{ JS expressions inserted in the body }
+ Use a JSTemplates.Future instance to delay evaluation (right now only supported in the list tag)
+-->
+
+<!-- Procedural -->
 <div id="output"></div>
 <script>
-	loadTemplate("output", "@{'/public/templates/t1.html'}");
+	JSTemplates.loadTemplate("output", "@{'/public/templates/t1.html'}");
 </script>
+
+<!-- jQuery plugin -->
+<div id="output2"></div>
+<script>
+	jQuery("#output2").jsTemplates("@{'/public/templates/t1.html'}");
+</script>
+
+<!-- Declarative -->
+<div data-template="@{'/public/templates/t1.html'}"></div>
+
+<!-- Inline -->
+<div data-jstemplate="inline">
+ <script type="text/html">
+  <ul>
+  ~{list items:[1,2,3], var:'i' }
+   <li>inline item: ^{i}</li>
+  ~{/list}
+  </ul>
+  <ul>
+  ~{list items:new JSTemplates.Future("/data"), var:'d' }
+   <li>Future data: ^{d}</li>
+  ~{/list}
+  </ul>
+ </script>
+</div>

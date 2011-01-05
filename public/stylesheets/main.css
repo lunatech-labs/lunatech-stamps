@@ -1,0 +1,12 @@
+div {
+	border: 1px red solid;
+	margin: 5px;
+	padding: 5px;
+}
+
+.jstemplates-waiter {
+	background-image: url(../images/spinner.gif);
+	display: inline-block;
+	padding-left: 20px;
+	background-repeat: no-repeat;
+}
