@@ -6,27 +6,32 @@
  ~{tag /} or ~{tag}{/tag}
  !{ JS statements }!
  ^{ JS expressions inserted in the body }
+ `{ JS expression that is saved during template expansion, to be used in later JS code }
  Use a JSTemplates.Future instance to delay evaluation (right now only supported in the list tag)
 -->
 
 <!-- Procedural -->
+Procedural template expansion:
 <div id="output"></div>
 <script>
-	JSTemplates.loadTemplate("output", "@{'/public/templates/t1.html'}");
+	JSTemplates.loadTemplate("output", {url: "@{'/public/templates/t1.html'}"});
 </script>
 
 <!-- jQuery plugin -->
+jQuery template expansion:
 <div id="output2"></div>
 <script>
-	jQuery("#output2").jsTemplates("@{'/public/templates/t1.html'}");
+	jQuery("#output2").jsTemplates({url: "@{'/public/templates/t1.html'}"});
 </script>
 
 <!-- Declarative -->
-<div data-template="@{'/public/templates/t1.html'}"></div>
+Automatic template expansion:
+<div data-jstemplate-url="@{'/public/templates/t1.html'}"></div>
 
 <!-- Inline -->
-<div data-jstemplate="inline">
- <script type="text/html">
+Automatic inline template expansion:
+<div>
+<script data-jstemplate="inline" type="text/html">
   <ul>
   ~{list items:[1,2,3], var:'i' }
    <li>inline item: ^{i}</li>
@@ -37,5 +42,84 @@
    <li>Future data: ^{d}</li>
   ~{/list}
   </ul>
- </script>
+</script>
 </div>
+
+<!-- Extensions -->
+<script type="text/javascript">
+//define our new tag type
+function HelloTag(name, attributes){
+	JSTemplates.Tag.apply(this, [name, attributes]);
+}
+// make sure it inherits methods from JSTemplates.Tag
+JSTemplates.extend(HelloTag, JSTemplates.Tag);
+
+// and implement its behaviour
+HelloTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	// when we do not name the attributes, the default is "_arg"
+	// we evaluate the contents of the attribute in the current environment
+	var string = env.evalExpression(this.attributes._arg);
+	// and we write it out
+	out('Hello ' + string);
+};
+
+// register this new tag in JSTemplates
+JSTemplates.declareTag('hello', HelloTag);
+</script>
+
+<!-- Simple Extensions -->
+<script name="hello2" data-jstemplate="tag" type="text/html">
+ Hello ^{_arg}
+</script>
+
+<script name="hello3" data-jstemplate="tag" type="text/html">
+ Hello ^{_firstName} ^{_lastName}
+</script>
+
+<script name="hello4" data-jstemplate="tag" type="text/html">
+ Hello ^{_firstName} ~{doBody/} ^{_lastName}
+</script>
+
+<!-- Inline -->
+<script data-jstemplate="inline" type="text/html">
+ Custom JS tag:
+ <div>~{hello 'World!' /}</div>
+ Simple tag with default argument:
+ <div>~{hello2 'simple World!' /}</div>
+ Simple tag with named arguments:
+ <div>~{hello3 firstName: 'Stef', lastName: 'Epardaud' /}</div>
+ Simple tag with named arguments and a body:
+ <div>~{hello4 firstName: 'Stef', lastName: 'Epardaud' }FroMage~{/hello4}</div>
+</script>
+
+<!-- Simple Reference -->
+<script id="ref1" data-jstemplate="ref" type="text/html">
+ ~{hello subject /}
+</script>
+
+Template reference with initial environment:
+<div id="ref1-target"></div>
+<script type="text/javascript">
+ jQuery(function(){
+	jQuery("#ref1-target").jsTemplates({id: "ref1"}, {subject: 'universe!'});
+ });
+</script>
+
+<!-- Complex Reference -->
+<script id="ref2" data-jstemplate="ref" type="text/html">
+ <i>^{user.firstName}</i> <b>^{user.lastName}</b>
+ <a href="#" onclick="return `{user}.clicky()">Click me (please)</a>
+</script>
+
+Template reference with initial environment and dynamic value:
+<div id="ref2-target"></div>
+<script type="text/javascript">
+ jQuery(function(){
+	var user = {firstName: "Stef", lastName: "Epardaud"};
+	user.clicky = function(){
+		alert("I was clicked: "+user.firstName);
+		return false;
+	}
+	jQuery("#ref2-target").jsTemplates({id: "ref2"}, {user: user});
+ });
+</script>

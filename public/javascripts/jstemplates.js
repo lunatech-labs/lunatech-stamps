@@ -1,7 +1,23 @@
 var JSTemplates = {};
 
+/*
+ * TODO:
+ * 
+ * - Figure out if scopes should be lexical and/or dynamic
+ * - Make Future its own tag and get it out of the list tag
+ */
+
 // this is a private scope
 (function(){
+
+//
+// Our gensym
+
+var gensymCounter = 0;
+
+function gensym(){
+	return '__jstemplates_' + gensymCounter++;
+}
 
 //
 // Our Type extension mechanism
@@ -17,6 +33,8 @@ function extend(SubType, ParentType){
 	}
 	SubType.prototype.constructor = constructor;
 }
+// make it public
+JSTemplates.extend = extend;
 
 //
 // Code and expression types
@@ -40,6 +58,29 @@ Code.prototype.output = function(out, previousSibling, env){
 };
 
 //
+// References
+
+var references = JSTemplates.references = {};
+
+JSTemplates.getReference = function (name){
+	return references[name];
+}
+
+function Reference(ref){
+	this.ref = ref;
+}
+
+Reference.prototype.output = function(out, previousSibling, env){
+	// eval the string
+	var val = env.evalExpression(this.ref);
+	// now remember it for later somewhere
+	var refName = gensym();
+	references[refName] = val;
+	// and output code that can get to it
+	out("JSTemplates.getReference('"+refName+"')");
+};
+
+//
 // Our pluggable Tag system
 
 var declaredTags = {};
@@ -49,14 +90,11 @@ var declareTag = JSTemplates.declareTag = function(name, constructor){
 }
 
 function makeTag(name, attributes){
-	var constructor = declaredTags[name] || Tag;
+	var constructor = declaredTags[name];
+	if(!constructor)
+		throw "Unknown tag: " + name;
 	return new constructor(name, attributes);
 }
-
-// the initial list
-declareTag('if', IfTag);
-declareTag('else', ElseTag);
-declareTag('list', ListTag);
 
 //
 // Our base Tag type
@@ -101,12 +139,6 @@ Tag.prototype.recursiveOutput = function(out, env){
 //
 // The list tag
 
-var gensymCounter = 0;
-
-function gensym(){
-	return '__jstemplates_' + gensymCounter++;
-}
-
 function ListTag(name, attributes){
 	Tag.apply(this, [name, attributes]);
 }
@@ -134,7 +166,8 @@ ListTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 				var target = jQuery("#"+substId);
 				target.removeClass("jstemplates-waiter");
 				tag.resumingFromFuture = data;
-				evalTemplate(tag, clonedEnv, target);
+				var html = evalTemplate(tag, clonedEnv);
+				target.replaceWith(html);
 			});
 			out("<span class='jstemplates-waiter' id='"+substId+"'>Loading...</span>");
 		}
@@ -186,44 +219,139 @@ ElseTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 };
 
 //
+// The doBody tag
+
+function DoBodyTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(DoBodyTag, Tag);
+
+DoBodyTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	// we must obtain the body of the current tag's invocation
+	var body = env.getContext('body');
+	if(!body)
+		throw "Invalid doBody tag: not invoked via simple tag";
+	// and invoke it as if it were located here
+	body.recursiveOutput(out, env);
+};
+
+// 
+// Declare the initial list of tags
+declareTag('if', IfTag);
+declareTag('else', ElseTag);
+declareTag('list', ListTag);
+declareTag('doBody', DoBodyTag);
+
+//
+// Our cached templates
+
+var templates = {};
+
+//
 // Functions
 
 // Procedural API
-JSTemplates.loadTemplate = function loadTemplate(id, url){
-	loadTemplateFromURL(jQuery('#'+id), url);
+JSTemplates.loadTemplate = function loadTemplate(id, params, env){
+	jQuery('#'+id).jsTemplates(params, env);
 }
 
 // jQuery plugin
-jQuery.fn.jsTemplates = function(url){
+jQuery.fn.jsTemplates = function(params, env){
 	var target = this;
-	loadTemplateFromURL(target, url);
+	if(params.url)
+		loadTemplateFromURL(target, params.url, env);
+	else if(params.id){
+		var template = templates[params.id];
+		if(!template)
+			throw "Invalid template id: "+params.id;
+		var html = evalTemplate(template, new Environment(env));
+		target.html(html);
+	}else
+		throw "Invalid or missing argument, expecting id or url";
 }
 
-// data-template="url" support
+// magic processing
 jQuery(function(){
-	jQuery("[data-template]").each(function(index, elem){
+	// we fist want to load all user tags
+	// data-jstemplate="tag" support
+	jQuery("[data-jstemplate=tag]").each(function(index, elem){
 		var $elem = jQuery(elem);
-		var url = $elem.attr('data-template');
+		var name = $elem.attr('name');
+		if(!name)
+			throw "Missing name on template tag";
+		var data = $elem.html();
+		var tag = parseTemplates(data);
+		console.log("Defining new tag: "+tag);
+
+		// make a new type, hehe
+		function UserTag(name, attributes){
+			// do like Play! and prepend '_' to attributes
+			var newAttributes = {};
+			for(var attribute in attributes){
+				var newAttribute;
+				if(!attribute.match(/^_/))
+					newAttribute = "_" + attribute;
+				else
+					newAttribute = attribute;
+				newAttributes[newAttribute] = attributes[attribute];
+			}
+			Tag.apply(this, [name, newAttributes]);
+		}
+		extend(UserTag, Tag);
+
+		UserTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+			// we start by defining the variables passed to us
+			for(var attribute in this.attributes){
+				this.attributes[attribute] = env.evalExpression(this.attributes[attribute]);
+			}
+			env.declareVariables(this.attributes);
+			// then we let the 'doBody' tag know that we hold the body
+			env.pushContext('body', this);
+			// now proceed with the tag body
+			tag.output(out, undefined, env);
+			// and pop the context
+			env.popContext('body');
+		};
+
+		declareTag(name, UserTag);
+	});
+
+	// then define new templates by reference
+	// data-jstemplate="ref" support
+	jQuery("[data-jstemplate=ref]").each(function(index, elem){
+		var $elem = jQuery(elem);
+		var id = $elem.attr('id');
+		if(!id)
+			throw "Missing ID on template reference";
+		var data = $elem.html();
+		templates[id] = parseTemplates(data);
+	});
+	
+	// and then process the templates
+	
+	// data-template="url" support
+	jQuery("[data-jstemplate-url]").each(function(index, elem){
+		var $elem = jQuery(elem);
+		var url = $elem.attr('data-jstemplate-url');
 		loadTemplateFromURL($elem, url);
 	});
-});
 
-// data-istemplate="inline" support
-jQuery(function(){
-	jQuery("[data-jstemplate]").each(function(index, elem){
+	// data-jstemplate="inline" support
+	jQuery("[data-jstemplate=inline]").each(function(index, elem){
 		var $elem = jQuery(elem);
-		var data = jQuery('script[type=text/html]', $elem).html();
-		console.log('data is '+data);
-		processTemplates($elem, data);
+		var data = $elem.html();
+		var html = processTemplates(data);
+		$elem.replaceWith(html);
 	});
 });
 
-function loadTemplateFromURL(target, url){
+function loadTemplateFromURL(target, url, env){
 	jQuery.ajax({
 		method: 'GET',
 		url: url,
 		success: function(data){
-			processTemplates(target, data);
+			var html = processTemplates(data, env);
+			target.html(html);
 		},
 		error: function(ouch){
 			alert(ouch);
@@ -231,98 +359,113 @@ function loadTemplateFromURL(target, url){
 	});
 }
 
-function processTemplates($target, text){
-	// this is in there to capture an env where currentTag is defined
-	function parseTemplates(text){
-		//console.log('text: '+text);
-		var openCode = undefined;
-		var openExpr = undefined;
-		var openTag = undefined;
-		var lastText = 0;
-		for(var i=0;i<text.length;i++){
-			var c = text[i];
-			var hasMore = i<text.length-1;
-			var c2 = hasMore ? text[i+1] : undefined;
-			// Code block
-			if(c === '!' && c2 === '{'){
-				// collect text leading to this
-				currentTag.addChild(text.substring(lastText, i));
-				i++;
-				openCode = i+1;
-			}else if(openCode !== undefined && c === '}' && c2 === '!'){
-				var code = text.substring(openCode, i);
-				console.log('Got code: '+code);
-				currentTag.addChild(new Code(code));
-				// move past the '}' to the '5'
-				i++;
-				// start collecting text after the '5'
-				lastText = i+1;
-				openCode = undefined;
-			}
-			// Expression block
-			else if(c === '^' && c2 === '{'){
-				// collect text leading to this
-				currentTag.addChild(text.substring(lastText, i));
-				i++;
-				openExpr = i+1;
-			}else if(openExpr !== undefined && c === '}'){
-				var expr = text.substring(openExpr, i);
-				console.log('Got expr: '+expr);
-				currentTag.addChild(new Expression(expr));
-				// start collecting text after the '}'
-				lastText = i+1;
-				openExpr = undefined;
-			}
-			// Tag block
-			else if(c === '~' && c2 === '{'){
-				// collect text leading to this
-				currentTag.addChild(text.substring(lastText, i));
-				i++;
-				openTag = i+1;
-			}else if(openTag !== undefined && c === '}'){
-				var tag = text.substring(openTag, i);
-				console.log('Got tag: '+tag);
-				var newTag = parseTag(tag);
-				if(newTag.isEnd){
-					// we are closing the current tag
-					if(newTag.name != currentTag.name)
-						throw "Invalid end tag "+newTag.name+" for current tag "+currentTag.name;
-					currentTag = currentTag.parent;
-				}else{
-					currentTag.addChild(newTag);
-					newTag.parent = currentTag;
-					if(!newTag.isClosed){
-						// this is the start of a new tag, let's dig in
-						currentTag = newTag;
-					}
-				}
-				// start collecting text after the '}'
-				lastText = i+1;
-				openTag = undefined;
-			}
-		}
-		if(lastText < text.length)
-			currentTag.addChild(text.substring(lastText));
-	}
+function processTemplates(text, env){
+	var tag = parseTemplates(text);
+	// now output
+	return evalTemplate(tag, new Environment(env));
+}
 
+function parseTemplates(text){
 	// start with a tag
 	var currentTag = new Tag('main');
-	parseTemplates(text);
+
+	//console.log('text: '+text);
+	var openCode = undefined;
+	var openExpr = undefined;
+	var openTag = undefined;
+	var openRef = undefined;
+	var lastText = 0;
+	for(var i=0;i<text.length;i++){
+		var c = text[i];
+		var hasMore = i<text.length-1;
+		var c2 = hasMore ? text[i+1] : undefined;
+		// Code block
+		if(c === '!' && c2 === '{'){
+			// collect text leading to this
+			currentTag.addChild(text.substring(lastText, i));
+			i++;
+			openCode = i+1;
+		}else if(openCode !== undefined && c === '}' && c2 === '!'){
+			var code = text.substring(openCode, i);
+			console.log('Got code: '+code);
+			currentTag.addChild(new Code(code));
+			// move past the '}' to the '5'
+			i++;
+			// start collecting text after the '5'
+			lastText = i+1;
+			openCode = undefined;
+		}
+		// Expression block
+		else if(c === '^' && c2 === '{'){
+			// collect text leading to this
+			currentTag.addChild(text.substring(lastText, i));
+			i++;
+			openExpr = i+1;
+		}else if(openExpr !== undefined && c === '}'){
+			var expr = text.substring(openExpr, i);
+			console.log('Got expr: '+expr);
+			currentTag.addChild(new Expression(expr));
+			// start collecting text after the '}'
+			lastText = i+1;
+			openExpr = undefined;
+		}
+		// Reference block
+		else if(c === '`' && c2 === '{'){
+			// collect text leading to this
+			currentTag.addChild(text.substring(lastText, i));
+			i++;
+			openRef = i+1;
+		}else if(openRef !== undefined && c === '}'){
+			var ref = text.substring(openRef, i);
+			console.log('Got ref: '+ref);
+			currentTag.addChild(new Reference(ref));
+			// start collecting text after the '}'
+			lastText = i+1;
+			openRef = undefined;
+		}
+		// Tag block
+		else if(c === '~' && c2 === '{'){
+			// collect text leading to this
+			currentTag.addChild(text.substring(lastText, i));
+			i++;
+			openTag = i+1;
+		}else if(openTag !== undefined && c === '}'){
+			var tag = text.substring(openTag, i);
+			console.log('Got tag: '+tag);
+			var newTag = parseTag(tag);
+			if(newTag.isEnd){
+				// we are closing the current tag
+				if(newTag.name != currentTag.name)
+					throw "Invalid end tag "+newTag.name+" for current tag "+currentTag.name;
+				currentTag = currentTag.parent;
+			}else{
+				currentTag.addChild(newTag);
+				newTag.parent = currentTag;
+				if(newTag.isOpen){
+					// this is the start of a new tag, let's dig in
+					currentTag = newTag;
+				}
+			}
+			// start collecting text after the '}'
+			lastText = i+1;
+			openTag = undefined;
+		}
+	}
+	if(lastText < text.length)
+		currentTag.addChild(text.substring(lastText));
 	// sanity check
 	if(currentTag.name != 'main')
 		throw "Bad current tag after parsing";
-	// now output
-	evalTemplate(currentTag, new Environment(), $target);
+	return currentTag;
 }
 
-function evalTemplate(tag, env, $target){
+function evalTemplate(tag, env, $target, replace){
 	var data = '';
 	tag.output(function(part){
 		console.log('outputing '+part);
 		data += part;
 	}, null, env);
-	// and replate
-	$target.html(data);
+	return data;
 }
 
 function parseTag(tag){
@@ -396,24 +539,65 @@ function parseTag(tag){
 //
 // Environment magic
 
-function Environment(){
+function Environment(initialValues){
 	this.env = eval(extendEnv("42"));
-	this.savedEnvironments = [];
+	this.context = {};
+	if(initialValues){
+		this.declareVariables(initialValues);
+	}
+}
+
+Environment.prototype.declareVariables = function(initialValues){
+	var decl = "var "; 
+	for(var name in initialValues){
+		if(decl.length > 4)
+			decl += ", ";
+		decl += name;
+	}
+	decl += ";";
+	this.evalStatement(decl);
+	for(var name in initialValues){
+		this.setVariable(name, initialValues[name]);
+	}		
+}
+
+Environment.prototype.pushContext = function(contextName, value){
+	if(!this.context[contextName])
+		this.context[contextName] = [];
+	this.context[contextName].push(value);
+}
+
+Environment.prototype.popContext = function(contextName){
+	var ctx = this.context[contextName];
+	if(!ctx)
+		throw "No such context: "+contextName;
+	return ctx.pop();
+}
+
+Environment.prototype.getContext = function(contextName){
+	var ctx = this.context[contextName];
+	if(!ctx)
+		throw "No such context: "+contextName;
+	return ctx[ctx.length-1];
 }
 
 Environment.prototype.preserve = function(){
-	this.savedEnvironments.push(this.env);
+	this.pushContext('environment', this.env);
+}
+
+Environment.prototype.restore = function(){
+	this.env = this.popContext('environment');
 }
 
 Environment.prototype.clone = function(){
 	var clone = new Environment();
 	clone.env = this.env;
-	clone.savedEnvironments = this.savedEnvironments.concat(); // copy list
+	// deep copy the context
+	clone.context = {};
+	for(var contextName in this.context){
+		clone.context[contextName] = this.context[contextName].concat(); // copy list
+	}
 	return clone;
-}
-
-Environment.prototype.restore = function(){
-	this.env = this.savedEnvironments.pop();
 }
 
 Environment.prototype.evalStatement = function(stmt){
@@ -432,7 +616,7 @@ function extendEnv(e, isExpr){
 	var body;
 	if(isExpr === true)
 		body = "return ("+e+");";
-	else if(isExpr)
+	else if(isExpr) // this means we want to inject a value in a variable
 		body = "return function(e){ "+isExpr+" = e;};";
 	else
 		body = e+"; return function(e, isExpr){ return eval(extendEnv(e, isExpr)); }";

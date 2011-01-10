@@ -3,6 +3,7 @@ Due to conflicts with Play! templates the tags are defined like this:
 ~{tag /} or ~{tag}{/tag}
 !{ JS statements }!
 ^{ JS expressions inserted in the body }
+ `{ JS expression that is saved during template expansion, to be used in later JS code }
 
 Use a JSTemplates.Future instance to delay evaluation (right now only supported in the list tag).
 
@@ -15,7 +16,10 @@ h2. Procedural style
 <pre><code>
 <div id="output"></div>
 <script>
-	JSTemplates.loadTemplate("output", "/public/templates/t1.html");
+	// for a remote template
+	JSTemplates.loadTemplate("output", {url: "/public/templates/t1.html"}, /* optional */ {value: "foo"});
+	// for a template reference
+	JSTemplates.loadTemplate("output", {id: "my-template"}, /* optional */ {value: "foo"});
 </script>
 </code></pre>
 
@@ -24,24 +28,33 @@ h2. jQuery plugin style
 <pre><code>
 <div id="output2"></div>
 <script>
-	jQuery("#output2").jsTemplates("/public/templates/t1.html");
+	// for a remote template
+	jQuery("#output2").jsTemplates({url: "/public/templates/t1.html"}, /* optional */ {value: "foo"});
+	// for a template reference
+	jQuery("#output2").jsTemplates({id: "my-template"}, /* optional */ {value: "foo"});
 </script>
 </code></pre>
 
 h2. Declarative style
 
 <pre><code>
-<div data-template="/public/templates/t1.html"></div>
+<div data-jstemplate-url="/public/templates/t1.html"></div>
 </code></pre>
 
 h2. Inline style
 
 <pre><code>
-<div data-jstemplate="inline">
- <script type="text/html">
-  ...
- </script>
-</div>
+<script data-jstemplate="inline" type="text/html">
+ ...
+</script>
+</code></pre>
+
+h2. Declaring a template reference
+
+<pre><code>
+<script id="my-template" data-jstemplate="ref" type="text/html">
+ ...
+</script>
 </code></pre>
 
 h1. Writing templates
@@ -61,6 +74,17 @@ Write JS expressions to be inserted in the page like this:
 <pre><code>
  ^{ foo > 2 ? foo + 23 : foo }
 </code></pre>
+
+h2. Dynamic blocks
+
+Write JS expressions that should be injected as JS values for JS code in the page like this:
+
+<pre><code>
+ <a onclick="`{ user.save }()">Click me</a>
+</code></pre>
+
+This is very useful for exposing values which exist during template evaluation as values
+that can be used in the generated JS code itself.
 
 h2. Tags
 
@@ -105,7 +129,47 @@ The @list@ tag allows you to write iterative templates:
  </ul>
 </code></pre>
 
-h3. Writing your own tag
+h2. Writing your own tag
+
+h3. Simple tags
+
+You can declare your simple tags like this:
+
+<pre><code>
+ <script jstemplate="tag" name="hello" type="text/html">
+  Hello ^{_arg}!
+ </script>
+</code></pre>
+
+And then invoke it later on with:
+
+<pre><code>
+ <script jstemplate="inline" type="text/html">
+  #{hello 'World'/}
+ </script>
+</code></pre>
+
+Which will produce @Hello World!@.
+
+If you pass a single unnamed parameter it will be named @_arg@ but you can also
+explicitely name them (in which case they should be accessed with a leading underscore)
+and even pass in a body to be expanded with the @doBody@ tag:
+
+<pre><code>
+ <script jstemplate="tag" name="hello" type="text/html">
+  Hello ^{_firstName} "~{doBody/}" ^{_lastName}!
+ </script>
+
+ <script jstemplate="inline" type="text/html">
+  #{hello firstName: 'Stef', lastName: 'Epardaud'}
+   FroMage
+  #{/hello}
+ </script>
+</code></pre>
+
+Which will produce @Hello Stef "FroMage" Epardaud!@.
+
+h3. Coding your own tag
 
 You must define a subtype of @JSTemplates.Tag@, and register it for JSTemplates to find:
 

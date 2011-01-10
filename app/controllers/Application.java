@@ -12,7 +12,7 @@ public class Application extends Controller {
     }
 
     public static void data() throws InterruptedException{
-    	Thread.sleep(5000);
+    	Thread.sleep(1000);
     	List<String> data = new ArrayList<String>();
     	data.add("first");
     	data.add("second");
