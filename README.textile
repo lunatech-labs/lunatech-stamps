@@ -7,7 +7,7 @@ Due to conflicts with Play! templates the tags are defined like this:
 
 Use a JSTemplates.Future instance to delay evaluation in the @future@ tag.
 
-See examples in /app/views/Application/index.html and /public/templates/t1.html
+See examples in /app/views/Application/index.html, /public/templates/t1.html and /app/views/Application/facebook.html for a full-fledged AJAX application. 
 
 h1. Using templates
 
@@ -16,7 +16,7 @@ h2. Procedural style
 <pre><code>
 <div id="output"></div>
 <script>
-    // Those will replace the content of #output with the result of the template evaluation
+	// Those will replace the content of #output with the result of the template evaluation
 	// for a remote template
 	JSTemplates.loadTemplate("output", {url: "/public/templates/t1.html"}, /* optional */ {value: "foo"});
 	// for a template reference
@@ -49,7 +49,7 @@ h2. Inline style
 
 <pre><code>
 <script data-jstemplate="inline" type="text/html">
- ...
+ ... template data ...
 </script>
 </code></pre>
 
@@ -57,7 +57,7 @@ h2. Declaring a template reference
 
 <pre><code>
 <script id="my-template" data-jstemplate="ref" type="text/html">
- ...
+ ... template data ...
 </script>
 </code></pre>
 
@@ -87,8 +87,7 @@ Write JS expressions that should be injected as JS values for JS code in the pag
  <a onclick="`{ user.save }()">Click me</a>
 </code></pre>
 
-This is very useful for exposing values which exist during template evaluation as values
-that can be used in the generated JS code itself.
+This is very useful for exposing values which exist during template evaluation as values that can be used in the generated JS code itself.
 
 h2. Tags
 
@@ -149,19 +148,13 @@ h3. Future tag
 
 The @future@ tag allows you to delay template evaluation until the given Future is defined.
 
-When doing AJAX it's likely you'll have some templates that will depend on external data which you load using
-AJAX, which means it's going to be asynchronous.
+When doing AJAX it's likely you'll have some templates that will depend on external data which you load using AJAX, which means it's going to be asynchronous.
 
-In JSTemplates we use _futures_ to describe values that might or might not yet be defined (because they could
-arrive later via AJAX). When you pass the @future@ tag a value which is an instance of the type @JSTemplates.Future@, the current template tag evaluation is delayed until the _future_ instance is defined
-fully (when it receives its value from the network, for instance), and the current template is _partially_ evaluated,
-leaving gaps (actually, placeholders) where the template tags are waiting for _futures_.
+In JSTemplates we use _futures_ to describe values that might or might not yet be defined (because they could arrive later via AJAX). When you pass the @future@ tag a value which is an instance of the type @JSTemplates.Future@, the current template tag evaluation is delayed until the _future_ instance is defined fully (when it receives its value from the network, for instance), and the current template is _partially_ evaluated, leaving gaps (actually, placeholders) where the template tags are waiting for _futures_.
 
-Once the _future_ instances are complete, the template processing is resumed with the _future_'s value and the
-placeholders are replaced with the evaluation of the delayed templates.
+Once the _future_ instances are complete, the template processing is resumed with the _future_'s value and the placeholders are replaced with the evaluation of the delayed templates.
 
-This makes it very easy to define a complete page with _holes_ for the parts which rely on external data, without
-delaying the rendering of the rest of the templates.
+This makes it very easy to define a complete page with _holes_ for the parts which rely on external data, without delaying the rendering of the rest of the templates.
 
 You can define a _future_ which gets JSON data from an external source like this:
 
@@ -175,8 +168,7 @@ You can define a _future_ which gets JSON data from an external source like this
 ~{/future}
 </code></pre>
 
-Note that you can define your own subclasses of @JSTemplate.Future@ to define new types of ways
-to get to asynchronous data.
+Note that you can define your own subclasses of @JSTemplate.Future@ to define new types of ways to get to asynchronous data.
 
 h2. Writing your own tag
 
@@ -214,9 +206,7 @@ Or procedurally:
 
 Which will produce @Hello World!@.
 
-If you pass a single unnamed parameter it will be named @_arg@ but you can also
-explicitely name them (in which case they should be accessed with a leading underscore)
-and even pass in a body to be expanded with the @doBody@ tag:
+If you pass a single unnamed parameter it will be named @_arg@ but you can also explicitely name them (in which case they should be accessed with a leading underscore) and even pass in a body to be expanded with the @doBody@ tag:
 
 <pre><code>
  <script jstemplate="tag" name="hello" type="text/html">
