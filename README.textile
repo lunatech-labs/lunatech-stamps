@@ -90,8 +90,7 @@ Tags can either have a body:
 
 Or they can have no body:
 
-<pre><code>
- ~{tag/}
+<pre><code> ~{tag/}
 </code></pre>
 
 There are a number of defined tags, and you can write your own if you want.
@@ -118,6 +117,19 @@ The @list@ tag allows you to write iterative templates:
   <li>Value of v is: ^{v}</li>
  ~{/list}
  </ul>
+</code></pre>
+
+h3. DoBody tag
+
+The @doBody@ tag allows you to insert the content of the invoking tag:
+
+<pre><code> <script jstemplate="tag" name="quote" type="text/html">
+  "~{doBody/}"
+ </script>
+
+ <script jstemplate="inline" type="text/html">
+  #{quote}FroMage#{/quote}
+ </script>
 </code></pre>
 
 h3. Timer tag
@@ -162,8 +174,7 @@ h3. Simple tags
 
 You can declare your simple tags like this:
 
-<pre><code>
- <script jstemplate="tag" name="hello" type="text/html">
+<pre><code> <script jstemplate="tag" name="hello" type="text/html">
   Hello ^{_arg}!
  </script>
 </code></pre>
