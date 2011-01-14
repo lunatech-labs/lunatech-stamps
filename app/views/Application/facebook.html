@@ -1,0 +1,203 @@
+#{extends 'main.html' /}
+#{set 'moreScripts'}
+ <script src="@{'/public/javascripts/MD5.js'}" type="text/javascript" charset="utf-8"></script>
+#{/set}
+#{set 'moreStyles'}
+ <link rel="stylesheet" href="/public/stylesheets/facebook.css" type="text/css"/>
+#{/set}
+#{set title:'Home' /}
+
+<script type="text/javascript">
+// <!--
+
+function log(d){
+	if(window.console)
+		console.log(d);
+}
+
+function doDelete(id, link){
+	jQuery.ajax({
+		method: "DELETE",
+		url: link.url,
+		success: function(){
+			log("success!");
+			jQuery("#"+id).remove();
+		},
+		error: function(){
+			alert("error!");
+		}
+	});
+}
+
+function doAddComment(id, link){
+	var status = jQuery("#"+id);
+	var area = jQuery("textarea", status);
+	var value = area.val();
+	jQuery.ajax({
+		method: "POST",
+		data: {
+			value: value
+		},
+		url: link.url,
+		success: function(data){
+			atomize(data);
+			log(data);
+			var commentHtml = JSTemplates.applyTemplate("comment", {_arg: data});
+			jQuery("td.body .comment:last-child", status).before(commentHtml);
+			area.val('');
+		},
+		error: function(){
+			alert("error!");
+		}
+	});
+}
+
+function doAddStatus(id, link){
+	var status = jQuery(".statuses tr.status:first-child");
+	var area = jQuery("textarea", status);
+	var value = area.val();
+	jQuery.ajax({
+		method: "POST",
+		data: {
+			value: value
+		},
+		url: link.url,
+		success: function(data){
+			atomize(data);
+			log(data);
+			var commentHtml = JSTemplates.applyTemplate("status", {_status: data, _author: globalAuthor});
+			status.after(commentHtml);
+			area.val('');
+		},
+		error: function(){
+			alert("error!");
+		}
+	});
+}
+
+function atomize(object){
+	object.actions = {};
+	object.links.forEach(function(link){
+		object.actions[link.rel] = function(id){
+			log(link.rel+" called with id "+id);
+			if(link.rel == "remove")
+				doDelete(id, link);
+			else if(link.rel == "add-comment")
+				doAddComment(id, link);
+			else if(link.rel == "add-status")
+				doAddStatus(id, link);
+		}
+	});
+	if(object.comments)
+		object.comments.forEach(atomize);
+	if(object.updates)
+		object.updates.forEach(atomize);
+}
+
+var globalAuthor;
+
+//-->
+</script>
+
+<!-- Inline -->
+<script data-jstemplate="inline" type="text/html">
+ ~{future value:new JSTemplates.Future("/Application/statusUpdates"), var:'statuses' }
+  !{ 
+   // setup the actions
+   atomize(statuses); 
+   // remember the current user
+   globalAuthor = statuses.author;
+  }!
+  <table class="statuses">
+   <tr class="status">
+    <td colspan="2">
+     <div class="share">Share: <span class="status">Status</span></div>
+     <textarea></textarea>
+     <input onclick="`{statuses.actions['add-status']}(); return false;" 
+            type="submit" value="Share"/>
+    </td>
+   </tr>
+  ~{list items:statuses.updates, var:'status' }
+   ~{status status: status, author: statuses.author /}
+  ~{/list}
+  </table> <!-- statuses -->
+ ~{/future}
+</script>
+
+<script name="status" data-jstemplate="tag" type="text/html">
+   <tr class="status" id="status-^{_status.id}">
+    <td class="author-image">
+     ~{gravatar _status.author.email /}
+    </td>
+    <td class="body">
+     ~{if _status.actions.remove}
+      <a href="#" onclick="`{_status.actions.remove}('status-^{_status.id}'); return false;" class="remove"></a>
+     ~{/if}
+     <div class="author">^{_status.author.firstName} ^{_status.author.lastName}</div>
+     <div class="text">^{_status.text}</div>
+     <div class="date">~{date _status.date/}</div>
+     <table class="comments">
+     ~{list items:_status.comments, var:'comment' }
+      ~{comment comment/}
+     ~{/list}
+      <tr class="comment">
+       <td class="author-image">
+        ~{gravatar _author.email /}
+       </td>
+       <td class="body">
+        <textarea></textarea>
+        <input onclick="`{_status.actions['add-comment']}('status-^{_status.id}'); return false;" 
+               type="submit" value="Comment"/>
+       </td> <!-- body -->
+      </tr>
+     </table> <!-- comments -->
+    </td> <!-- body -->
+   </tr> <!-- status -->
+</script>
+
+<script name="comment" data-jstemplate="tag" type="text/html">
+ <tr class="comment" id="comment-^{_arg.id}">
+  <td class="author-image">
+   ~{gravatar _arg.author.email /}
+  </td>
+  <td class="body">
+   ~{if _arg.actions.remove}
+    <a href="#" onclick="`{_arg.actions.remove}('comment-^{_arg.id}'); return false;" class="remove"></a>
+   ~{/if}
+   <span class="author">^{_arg.author.firstName} ^{_arg.author.lastName}</span>
+   <span class="text">^{_arg.text}</span>
+   <div class="date">~{date _arg.date/}</div>
+  </td> <!-- body -->
+ </tr> <!-- comment -->
+</script>
+
+<script name="date" data-jstemplate="tag" type="text/html">
+ ~{timer 5000}
+ !{
+  var date = Math.round(new Date().setISO8601(_arg).getTime() / 1000);
+  var now = Math.round(new Date().getTime() / 1000);
+  var diff = now - date;
+ }!
+ ~{if diff == 0}
+  just now
+ ~{/if} 
+ ~{if diff > 0 && diff < 60}
+  ^{diff} second~{if diff > 1}s~{/if} ago
+ ~{/if}
+ ~{if diff >= 60 && diff < 3600}
+  !{ var min = Math.round(diff / 60); }!
+  ^{min} minute~{if min > 1}s~{/if} ago
+ ~{/if}
+ ~{if diff >= 3600 && diff < 86400}
+  !{ var hours = Math.round(diff / 3600); }!
+  ^{hours} hour~{if hours > 1}s~{/if} ago
+ ~{/if}
+ ~{if diff >= 86400}
+  ^{new Date(_arg).toLocaleDateString()}
+ ~{/if}
+ ~{/timer}
+</script>
+
+<script name="gravatar" data-jstemplate="tag" type="text/html">
+ <img src="http://www.gravatar.com/avatar/^{MD5(_arg.trim().toLowerCase())}"/>
+</script>

@@ -4,11 +4,18 @@ var JSTemplates = {};
  * TODO:
  * 
  * - Figure out if scopes should be lexical and/or dynamic
- * - Make Future its own tag and get it out of the list tag
+ * - Make type resolution dynamic so we can declare them in any order
  */
 
 // this is a private scope
 (function(){
+
+//
+// logging
+function log(d){
+	if(window.console)
+		console.log(d);
+}
 
 //
 // Our gensym
@@ -96,6 +103,13 @@ function makeTag(name, attributes){
 	return new constructor(name, attributes);
 }
 
+function makeTagOrRef(name, attributes){
+	var constructor = declaredTags[name];
+	if(!constructor)
+		return new TagReference(name, attributes);
+	return new constructor(name, attributes);
+}
+
 //
 // Our base Tag type
 
@@ -136,6 +150,30 @@ Tag.prototype.recursiveOutput = function(out, env){
 	}
 };
 
+Tag.prototype.resolve = function(){
+	for(var i=0;i<this.children.length;i++){
+		var child = this.children[i];
+		if(child instanceof Tag){
+			// deferred instantiation
+			if(child instanceof TagReference){
+				var newChild = makeTag(child.name, child.attributes);
+				newChild.children = child.children;
+				this.children[i] = child = newChild;
+			}
+			child.resolve();
+		}
+	}
+};
+
+//
+// Tag reference, for user-defined tags that get resolved later
+
+function TagReference(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(TagReference, Tag);
+
+
 //
 // The list tag
 
@@ -145,37 +183,7 @@ function ListTag(name, attributes){
 extend(ListTag, Tag);
 
 ListTag.prototype.outputInNewEnv = function(out, previousSibling, env){
-	var l;
-	if(this.resumingFromFuture){
-		l = this.resumingFromFuture;
-	}else{
-		l = env.evalExpression(this.attributes.items);
-	}
-	if(l instanceof Future){
-		var data = l.getData();
-		if(data){
-			// we already have the data, good
-			this.outputList(out, env, data);
-		}else{
-			// we need to delay evaluation
-			var substId = gensym();
-			var clonedEnv = env.clone();
-			var tag = this;
-			l.listen(function(data){
-				// resume templates at that point
-				var target = jQuery("#"+substId);
-				target.removeClass("jstemplates-waiter");
-				tag.resumingFromFuture = data;
-				var html = evalTemplate(tag, clonedEnv);
-				target.replaceWith(html);
-			});
-			out("<span class='jstemplates-waiter' id='"+substId+"'>Loading...</span>");
-		}
-	}else
-		this.outputList(out, env, l);
-};
-
-ListTag.prototype.outputList = function(out, env, l){
+	var l = env.evalExpression(this.attributes.items);
 	var v = env.evalExpression(this.attributes['var']);
 	var vList = v+"_list";
 	var vIndex = v+"_index";
@@ -189,6 +197,90 @@ ListTag.prototype.outputList = function(out, env, l){
 };
 
 //
+// Future tag
+
+function FutureTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(FutureTag, Tag);
+
+FutureTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	var v;
+	if(this.resumingFromFuture){
+		v = this.resumingFromFuture;
+	}else{
+		v = env.evalExpression(this.attributes.value);
+	}
+	if(v instanceof Future){
+		var data = v.getData();
+		if(data){
+			// we already have the data, good
+			this.outputBody(out, env, data);
+		}else{
+			// we need to delay evaluation
+			var substId = gensym();
+			var clonedEnv = env.clone();
+			var tag = this;
+			v.listen(function(data){
+				// resume templates at that point
+				var target = jQuery("#"+substId);
+				target.removeClass("jstemplates-waiter");
+				tag.resumingFromFuture = data;
+				var html = evalTemplate(tag, clonedEnv);
+				target.replaceWith(html);
+			});
+			out("<span class='jstemplates-waiter' id='"+substId+"'>Loading...</span>");
+		}
+	}else
+		this.outputBody(out, env, v);
+};
+
+FutureTag.prototype.outputBody = function(out, env, data){
+	var v = env.evalExpression(this.attributes['var']);
+	env.evalStatement("var "+v);
+	env.setVariable(v, data);
+	this.recursiveOutput(out, env);
+};
+
+//
+// Timer tag
+
+function TimerTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(TimerTag, Tag);
+
+TimerTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	var delay = env.evalExpression(this.attributes["_arg"]);
+	var substId = gensym();
+	var clonedEnv = env.clone();
+	var lastHtml = this.evalBody(clonedEnv);
+	var tag = this;
+	log("Timer of: "+delay+", id:  "+substId);
+	window.setInterval(function(){
+		log("Timer tick: "+substId);
+		var target = jQuery("#"+substId);
+		var newHtml = tag.evalBody(clonedEnv);
+		if(newHtml != lastHtml){
+			log("Timer replacing output");
+			var target = jQuery("#"+substId);
+			target.html(newHtml);
+			lastHtml = newHtml;
+		}
+	}, delay);
+	out("<span class='jstemplates-timer' id='"+substId+"'>"+lastHtml+"</span>");
+};
+
+TimerTag.prototype.evalBody = function(env){
+	var html = '';
+	var out = function(str){
+		html += str;
+	};
+	this.recursiveOutput(out, env);
+	return html;
+};
+
+//
 // The if tag
 
 function IfTag(name, attributes){
@@ -198,7 +290,7 @@ extend(IfTag, Tag);
 
 IfTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 	this.testMatched = env.evalExpression(this.attributes._arg);
-	console.log("if "+this.attributes._arg+" yielded "+this.testMatched);
+	log("if "+this.attributes._arg+" yielded "+this.testMatched);
 	if(this.testMatched)
 		this.recursiveOutput(out, env);
 };
@@ -240,6 +332,8 @@ DoBodyTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 declareTag('if', IfTag);
 declareTag('else', ElseTag);
 declareTag('list', ListTag);
+declareTag('future', FutureTag);
+declareTag('timer', TimerTag);
 declareTag('doBody', DoBodyTag);
 
 //
@@ -253,6 +347,13 @@ var templates = {};
 // Procedural API
 JSTemplates.loadTemplate = function loadTemplate(id, params, env){
 	jQuery('#'+id).jsTemplates(params, env);
+}
+
+JSTemplates.applyTemplate = function (template, env){
+	var template = templates[template];
+	if(!template)
+		throw "Invalid template id: "+params.id;
+	return evalTemplate(template, new Environment(env));
 }
 
 // jQuery plugin
@@ -281,7 +382,9 @@ jQuery(function(){
 			throw "Missing name on template tag";
 		var data = $elem.html();
 		var tag = parseTemplates(data);
-		console.log("Defining new tag: "+tag);
+		// also save it as a template
+		templates[name] = tag;
+		log("Defining new tag: "+tag);
 
 		// make a new type, hehe
 		function UserTag(name, attributes){
@@ -301,10 +404,11 @@ jQuery(function(){
 
 		UserTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 			// we start by defining the variables passed to us
+			var evaluatedAttributes = {};
 			for(var attribute in this.attributes){
-				this.attributes[attribute] = env.evalExpression(this.attributes[attribute]);
+				evaluatedAttributes[attribute] = env.evalExpression(this.attributes[attribute]);
 			}
-			env.declareVariables(this.attributes);
+			env.declareVariables(evaluatedAttributes);
 			// then we let the 'doBody' tag know that we hold the body
 			env.pushContext('body', this);
 			// now proceed with the tag body
@@ -326,6 +430,11 @@ jQuery(function(){
 		var data = $elem.html();
 		templates[id] = parseTemplates(data);
 	});
+	
+	// now we have every template defined, let's resolve them
+	for(var template in templates){
+		templates[template].resolve();
+	}
 	
 	// and then process the templates
 	
@@ -369,7 +478,7 @@ function parseTemplates(text){
 	// start with a tag
 	var currentTag = new Tag('main');
 
-	//console.log('text: '+text);
+	//log('text: '+text);
 	var openCode = undefined;
 	var openExpr = undefined;
 	var openTag = undefined;
@@ -387,7 +496,7 @@ function parseTemplates(text){
 			openCode = i+1;
 		}else if(openCode !== undefined && c === '}' && c2 === '!'){
 			var code = text.substring(openCode, i);
-			console.log('Got code: '+code);
+			log('Got code: '+code);
 			currentTag.addChild(new Code(code));
 			// move past the '}' to the '5'
 			i++;
@@ -403,7 +512,7 @@ function parseTemplates(text){
 			openExpr = i+1;
 		}else if(openExpr !== undefined && c === '}'){
 			var expr = text.substring(openExpr, i);
-			console.log('Got expr: '+expr);
+			log('Got expr: '+expr);
 			currentTag.addChild(new Expression(expr));
 			// start collecting text after the '}'
 			lastText = i+1;
@@ -417,7 +526,7 @@ function parseTemplates(text){
 			openRef = i+1;
 		}else if(openRef !== undefined && c === '}'){
 			var ref = text.substring(openRef, i);
-			console.log('Got ref: '+ref);
+			log('Got ref: '+ref);
 			currentTag.addChild(new Reference(ref));
 			// start collecting text after the '}'
 			lastText = i+1;
@@ -431,7 +540,7 @@ function parseTemplates(text){
 			openTag = i+1;
 		}else if(openTag !== undefined && c === '}'){
 			var tag = text.substring(openTag, i);
-			console.log('Got tag: '+tag);
+			log('Got tag: '+tag);
 			var newTag = parseTag(tag);
 			if(newTag.isEnd){
 				// we are closing the current tag
@@ -462,7 +571,7 @@ function parseTemplates(text){
 function evalTemplate(tag, env, $target, replace){
 	var data = '';
 	tag.output(function(part){
-		console.log('outputing '+part);
+		log('outputing '+part);
 		data += part;
 	}, null, env);
 	return data;
@@ -471,13 +580,13 @@ function evalTemplate(tag, env, $target, replace){
 function parseTag(tag){
 	if(tag[0] == '/'){
 		var name = tag.match(/^\/([a-zA-Z0-9]+)\s*$/)[1];
-		console.log('tag close for '+name);
-		var ret = makeTag(name);
+		log('tag close for '+name);
+		var ret = makeTagOrRef(name);
 		ret.isEnd = true;
 		return ret;
 	}
 	var name = tag.match(/^([a-zA-Z0-9]+)[ \/]?/)[1];
-	console.log('tag name: '+name);
+	log('tag name: '+name);
 	tag = tag.substring(name.length).trim();
 	var isOpen = !tag.match(/\/$/);
 	if(!isOpen)
@@ -530,8 +639,8 @@ function parseTag(tag){
 		// we have no attributes and some content: it's the implicit argument
 		attributes._arg = tag;
 	}
-	//console.log(attributes);
-	var ret = makeTag(name, attributes);
+	//log(attributes);
+	var ret = makeTagOrRef(name, attributes);
 	ret.isOpen = isOpen;
 	return ret;
 }
@@ -620,7 +729,7 @@ function extendEnv(e, isExpr){
 		body = "return function(e){ "+isExpr+" = e;};";
 	else
 		body = e+"; return function(e, isExpr){ return eval(extendEnv(e, isExpr)); }";
-	console.log("Eval: "+body);
+	log("Eval: "+body);
 	return "(function(){ "+body+" })()"; 
 }
 

@@ -1,0 +1,96 @@
+body {
+ font-family: "lucida grande",tahoma,verdana,arial,sans-serif;
+ font-size: 11pt;
+}
+div {
+ border: none;
+ margin: 0;
+ padding: 0;
+}
+
+.status > .body {
+ padding: 10px;
+}
+
+.comment > .body {
+ padding: 5px;
+}
+
+.statuses {
+ width: 500px;
+ font-size: 11px;
+ border-collapse: collapse;
+}
+.status > td {
+ border-bottom: #E9E9E9 1px solid;
+ padding-bottom: 5px;
+ padding-top: 10px;
+}
+.author-image, .body {
+ vertical-align: top;
+}
+.author-image {
+ width: 10px;
+}
+.author {
+ font-weight: bold;
+ color: #3B5998;
+}
+.date {
+ color: #999;
+}
+.comments {
+ margin-top: 2px;
+ padding: 5px 5px 4px;
+ width: 100%;
+ border-collapse: collapse;
+}
+
+.comment {
+ background-color: #EDEFF4;
+ border-bottom: 5px solid white;
+}
+
+.comment .author-image img {
+ width: 40px;
+}
+.remove {
+ float: right;
+ width: 15px;
+ height: 15px;
+ background: url(/public/images/cross.png);
+}
+
+.remove:hover {
+ background-position: 0 15px;
+}
+
+input[type=submit] {
+ cursor: pointer;
+ border-style: inset;
+ background-color: #5B74A8;
+ border: #29447E solid 1px;
+ font-weight: bold;
+ color: white;
+ float: right;
+}
+
+textarea {
+ width: 98%;
+ border: 1px solid #BDC7D8;
+}
+
+.share {
+ color: gray;
+ font-weight: bold;
+ margin-bottom: 10px;
+}
+
+.share .status {
+ padding-bottom: 2px;
+ padding-left: 20px;
+ color: black;
+ background: url(/public/images/share.gif);
+ background-position: 0 -15px;
+ background-repeat: no-repeat;
+}

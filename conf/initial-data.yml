@@ -1,0 +1,59 @@
+Author(stef):
+ email: "stef@lunatech.com"
+ firstName: Stephane
+ lastName: Epardaud
+
+Author(nico):
+ email: "nicolas@lunatech.com"
+ firstName: Nicolas
+ lastName: Leroux
+
+Author(sietse):
+ email: "sietse@lunatech.com"
+ firstName: Sietse
+ lastName: de Kaper
+
+Status(s1):
+ author: stef
+ text: "This is cool"
+ date: 2011-01-01
+
+Comment(c11):
+ status: s1
+ author: nico
+ text: "Yes very"
+ date: 2011-01-01
+
+Comment(c12):
+ status: s1
+ author: stef
+ text: Thanks
+ date: 2011-01-01
+
+Status(s2):
+ author: nico
+ text: "I'm tired"
+ date: 2011-01-01
+
+Comment(c21):
+ status: s2
+ author: stef
+ text: Me too
+ date: 2011-01-01
+
+Status(s3):
+ author: sietse
+ text: "Will you guys shut up?"
+ date: 2011-01-01
+
+Comment(c31):
+ status: s3
+ author: nico
+ text: Why?
+ date: 2011-01-01
+
+Comment(c32):
+ status: s3
+ author: sietse
+ text: I'm trying to sleep
+ date: 2011-01-01
