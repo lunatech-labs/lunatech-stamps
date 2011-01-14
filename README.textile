@@ -13,8 +13,7 @@ h1. Using templates
 
 h2. Procedural style
 
-<pre><code>
-<div id="output"></div>
+<pre><code><div id="output"></div>
 <script>
 	// Those will replace the content of #output with the result of the template evaluation
 	// for a remote template
@@ -29,8 +28,7 @@ h2. Procedural style
 
 h2. jQuery plugin style
 
-<pre><code>
-<div id="output2"></div>
+<pre><code><div id="output2"></div>
 <script>
 	// for a remote template
 	jQuery("#output2").jsTemplates({url: "/public/templates/t1.html"}, /* optional */ {value: "foo"});
@@ -41,22 +39,19 @@ h2. jQuery plugin style
 
 h2. Declarative style
 
-<pre><code>
-<div data-jstemplate-url="/public/templates/t1.html"></div>
+<pre><code><div data-jstemplate-url="/public/templates/t1.html"></div>
 </code></pre>
 
 h2. Inline style
 
-<pre><code>
-<script data-jstemplate="inline" type="text/html">
+<pre><code><script data-jstemplate="inline" type="text/html">
  ... template data ...
 </script>
 </code></pre>
 
 h2. Declaring a template reference
 
-<pre><code>
-<script id="my-template" data-jstemplate="ref" type="text/html">
+<pre><code><script id="my-template" data-jstemplate="ref" type="text/html">
  ... template data ...
 </script>
 </code></pre>
@@ -67,24 +62,21 @@ h2. Statement blocks
 
 Write JS statements (to declare variables for example) like this:
 
-<pre><code>
- !{ var foo = callthis(); }!
+<pre><code> !{ var foo = callthis(); }!
 </code></pre>
 
 h2. Expression blocks
 
 Write JS expressions to be inserted in the page like this:
 
-<pre><code>
- ^{ foo > 2 ? foo + 23 : foo }
+<pre><code> ^{ foo > 2 ? foo + 23 : foo }
 </code></pre>
 
 h2. Dynamic blocks
 
 Write JS expressions that should be injected as JS values for JS code in the page like this:
 
-<pre><code>
- <a onclick="`{ user.save }()">Click me</a>
+<pre><code> <a onclick="`{ user.save }()">Click me</a>
 </code></pre>
 
 This is very useful for exposing values which exist during template evaluation as values that can be used in the generated JS code itself.
@@ -93,8 +85,7 @@ h2. Tags
 
 Tags can either have a body:
 
-<pre><code>
- ~{tag}...~{/tag}
+<pre><code> ~{tag}...~{/tag}
 </code></pre>
 
 Or they can have no body:
@@ -109,14 +100,12 @@ h3. If tag
 
 The @if@ tag allows you to write conditional templates:
 
-<pre><code>
- ~{if foo == 42}Foo is the answer~{/if}
+<pre><code> ~{if foo == 42}Foo is the answer~{/if}
 </code></pre>
 
 The @else@ tag allows you to add a default condition to the @if@ tag:
 
-<pre><code>
- ~{if foo == 42}Foo is the answer~{/if}
+<pre><code> ~{if foo == 42}Foo is the answer~{/if}
  ~{else foo == 42}Foo is NOT the answer~{/else}
 </code></pre>
 
@@ -124,8 +113,7 @@ h3. List tag
 
 The @list@ tag allows you to write iterative templates:
 
-<pre><code>
- <ul>
+<pre><code> <ul>
  ~{list items: [1,2,3], var: 'v'}
   <li>Value of v is: ^{v}</li>
  ~{/list}
@@ -136,8 +124,7 @@ h3. Timer tag
 
 The @timer@ tag allows you to reevaluate the body every @X@ milliseconds:
 
-<pre><code>
-~{timer 1}
+<pre><code>~{timer 1}
  Time is ^{new Date().toLocaleString()}
 ~{/timer}
 </code></pre>
@@ -158,8 +145,7 @@ This makes it very easy to define a complete page with _holes_ for the parts whi
 
 You can define a _future_ which gets JSON data from an external source like this:
 
-<pre><code>
-~{future value:new JSTemplates.Future("/Application/data"), var:'elements' }
+<pre><code>~{future value:new JSTemplates.Future("/Application/data"), var:'elements' }
  <ul>
  ~{list items: elements, var: 'v'}
   <li>Value of v is: ^{v}</li>
@@ -184,18 +170,16 @@ You can declare your simple tags like this:
 
 And then invoke it later on with:
 
-<pre><code>
- <script jstemplate="inline" type="text/html">
+<pre><code> <script jstemplate="inline" type="text/html">
   #{hello 'World'/}
  </script>
 </code></pre>
 
 Or procedurally:
 
-<pre><code>
-<div id="output"></div>
+<pre><code><div id="output"></div>
 <script>
-    // Those will replace the content of #output with the result of the template evaluation
+	// Those will replace the content of #output with the result of the template evaluation
 	// for a template reference
 	JSTemplates.loadTemplate("output", {id: "hello"}, {_arg: "World"});
 	
@@ -208,8 +192,7 @@ Which will produce @Hello World!@.
 
 If you pass a single unnamed parameter it will be named @_arg@ but you can also explicitely name them (in which case they should be accessed with a leading underscore) and even pass in a body to be expanded with the @doBody@ tag:
 
-<pre><code>
- <script jstemplate="tag" name="hello" type="text/html">
+<pre><code> <script jstemplate="tag" name="hello" type="text/html">
   Hello ^{_firstName} "~{doBody/}" ^{_lastName}!
  </script>
 
@@ -226,8 +209,7 @@ h3. Coding your own tag
 
 You must define a subtype of @JSTemplates.Tag@, and register it for JSTemplates to find:
 
-<pre><code>
-// define our new tag type
+<pre><code>// define our new tag type
 function HelloTag(name, attributes){
 	JSTemplates.Tag.apply(this, [name, attributes]);
 }
@@ -249,8 +231,7 @@ JSTemplates.declareTag('hello', HelloTag);
 
 You can now use this tag as such:
 
-<pre><code>
-~{hello 'World!' /}
+<pre><code>~{hello 'World!' /}
 </code></pre>
 
 Which will produce @Hello World!@ :)
