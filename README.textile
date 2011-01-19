@@ -56,6 +56,15 @@ h2. Declaring a template reference
 </script>
 </code></pre>
 
+h2. Loading templates from remote files
+
+Tags in those remote files have to be declared as template references or simple tags (surrounded by @<script type="text/html">@).
+
+<pre><code><link rel="jstemplates" href="/public/templates/first-tags" type="text/html">
+<link rel="jstemplates" href="/public/templates/more-tags" type="text/html">
+</code></pre>
+
+
 h1. Writing templates
 
 h2. Statement blocks
