@@ -53,8 +53,8 @@ function doAddComment(id, link){
 }
 
 function doAddStatus(id, link){
-	var status = jQuery(".statuses tr.status:first-child");
-	var area = jQuery("textarea", status);
+	var $status = jQuery(".statuses tr.status:first-child");
+	var area = jQuery("textarea", $status);
 	var value = area.val();
 	jQuery.ajax({
 		method: "POST",
@@ -62,11 +62,15 @@ function doAddStatus(id, link){
 			value: value
 		},
 		url: link.url,
-		success: function(data){
-			atomize(data);
-			log(data);
-			var commentHtml = JSTemplates.applyTemplate("status", {_status: data, _author: globalAuthor});
-			status.after(commentHtml);
+		success: function(update){
+			atomize(update);
+			log(update);
+			// make sure we don't add it if the refresh thread already added it
+			if(!loadedStatuses[update.id]){
+				var commentHtml = JSTemplates.applyTemplate("status", {_status: update, _author: globalAuthor});
+				$status.after(commentHtml);
+				loadedStatuses[update.id] = true;
+			}
 			area.val('');
 		},
 		error: function(){
@@ -86,6 +90,8 @@ function atomize(object){
 				doAddComment(id, link);
 			else if(link.rel == "add-status")
 				doAddStatus(id, link);
+			else if(link.rel == "refresh")
+				setupRefresh(id, link);
 		}
 	});
 	if(object.comments)
@@ -94,6 +100,38 @@ function atomize(object){
 		object.updates.forEach(atomize);
 }
 
+function setupRefresh(id, link){
+	function refresh(){
+		jQuery.ajax({
+			method: "GET",
+			data: {
+				since: lastRefresh.toISO8601()
+			},
+			url: link.url,
+			success: function(data){
+				atomize(data);
+				log(data);
+				var $status = jQuery(".statuses tr.status:first-child");
+				lastRefresh = new Date().setISO8601(data.lastRefresh);
+				data.updates.forEach(function (status){
+					// only load if not already added (by ourselves)
+					if(!loadedStatuses[status.id]){
+						var statusHtml = JSTemplates.applyTemplate("status", {_status: status, _author: globalAuthor});
+						$status.after(statusHtml);
+						loadedStatuses[status.id] = true;
+					}
+				});
+			},
+			error: function(){
+				alert("error!");
+			}
+		});
+	}
+	window.setInterval(refresh, 5000);
+}
+
+var loadedStatuses = {};
+var lastRefresh;
 var globalAuthor;
 
 //-->
@@ -104,9 +142,16 @@ var globalAuthor;
  ~{future value:new JSTemplates.Future("/Application/statusUpdates"), var:'statuses' }
   !{ 
    // setup the actions
-   atomize(statuses); 
+   atomize(statuses);
+   // start refreshing
+   statuses.actions.refresh('foo');
+   lastRefresh = new Date().setISO8601(statuses.lastRefresh);
    // remember the current user
    globalAuthor = statuses.author;
+   // mark those statuses as loaded
+   statuses.updates.forEach(function(status){
+     loadedStatuses[status.id] = true;
+   });
   }!
   <table class="statuses">
    <tr class="status">

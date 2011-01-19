@@ -47,5 +47,5 @@ Date.prototype.toISO8601 = function (key) {
          f(this.getUTCHours())     + ':' +
          f(this.getUTCMinutes())   + ':' +
          f(this.getUTCSeconds())   + '.' +
-         f2(this.getUTCMilliseconds()) + 'Z' : null;
+         f2(this.getUTCMilliseconds()) + '-0000' : null;
 };

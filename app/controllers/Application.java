@@ -19,6 +19,8 @@ import models.Status;
 import models.StatusJSON;
 import models.StatusesJSON;
 
+import play.Logger;
+import play.data.binding.As;
 import play.db.jpa.JPABase;
 import play.mvc.Controller;
 
@@ -56,8 +58,13 @@ public class Application extends Controller {
 		}
 	}
     
-    public static void statusUpdates(){
-    	List<Status> updates = Status.find("ORDER BY date DESC").fetch();
+    public static void statusUpdates(@As("yyyy-MM-dd'T'HH:mm:ss.SSSZ") Date since){
+    	Logger.info("Date: "+ since);
+    	List<Status> updates;
+    	if(since != null){
+    		updates = Status.find("date > ? ORDER BY date DESC", since).fetch();
+    	}else
+    		updates = Status.find("ORDER BY date DESC").fetch();
     	Author author = Author.find("email", STEF).first();
     	renderJSON(new StatusesJSON(updates, author), new DateSerializer());
     }
