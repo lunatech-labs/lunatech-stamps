@@ -29,7 +29,9 @@
 </ul>
 
 <ul>
-~{list items:new JSTemplates.Future("/data"), var:'d' }
+~{future value:new JSTemplates.Future("/data"), var: 'items'}
+~{list items:items, var:'d' }
  <li>Future data: ^{d}</li>
 ~{/list}
+~{/future}
 </ul>
