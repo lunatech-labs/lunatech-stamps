@@ -4,7 +4,6 @@ var JSTemplates = {};
  * TODO:
  * 
  * - Figure out if scopes should be lexical and/or dynamic
- * - Make type resolution dynamic so we can declare them in any order
  */
 
 // this is a private scope
@@ -342,6 +341,18 @@ declareTag('doBody', DoBodyTag);
 var templates = {};
 
 //
+// The list of functions to call when templates are ready
+var onready = [];
+var ready = false;
+
+JSTemplates.ready = function(f){
+	if(!ready)
+		onready.push(f);
+	else
+		f();
+}
+
+//
 // Functions
 
 // Procedural API
@@ -372,7 +383,39 @@ jQuery.fn.jsTemplates = function(params, env){
 }
 
 // magic processing
-jQuery(function(){
+jQuery(autoProcess);
+
+function autoProcess(){
+	log("jstemplates autoprocess 1");
+	// first load all automatic tags, if any
+	var autoTags = jQuery("link[rel=jstemplates]");
+	if(autoTags.size() == 0)
+		autoProcess2();
+	else{
+		var waitedFor = autoTags.size();
+		function loadAutoTag(data){
+			jQuery("body").append(data);
+			waitedFor--;
+			if(waitedFor == 0)
+				autoProcess2();
+		}
+		// load them all
+		autoTags.each(function (index, link){
+			var $link = jQuery(link);
+			jQuery.ajax({
+				url: $link.attr("href"), 
+				method: "GET", 
+				success: loadAutoTag, 
+				error: function(){
+					alert("Failed to load autotag "+$link.attr("href"));
+				}
+			});
+		});
+	}
+}
+
+function autoProcess2(){
+	log("jstemplates autoprocess 2");
 	// we fist want to load all user tags
 	// data-jstemplate="tag" support
 	jQuery("[data-jstemplate=tag]").each(function(index, elem){
@@ -428,6 +471,7 @@ jQuery(function(){
 		if(!id)
 			throw "Missing ID on template reference";
 		var data = $elem.html();
+		log("Defining template ref "+id);
 		templates[id] = parseTemplates(data);
 	});
 	
@@ -452,7 +496,13 @@ jQuery(function(){
 		var html = processTemplates(data);
 		$elem.replaceWith(html);
 	});
-});
+	
+	// then trigger the ready signal
+	ready = true;
+	onready.forEach(function (f){
+		f();
+	});
+}
 
 function loadTemplateFromURL(target, url, env){
 	jQuery.ajax({
@@ -470,6 +520,8 @@ function loadTemplateFromURL(target, url, env){
 
 function processTemplates(text, env){
 	var tag = parseTemplates(text);
+	// resolve them
+	tag.resolve();
 	// now output
 	return evalTemplate(tag, new Environment(env));
 }
@@ -579,13 +631,13 @@ function evalTemplate(tag, env, $target, replace){
 
 function parseTag(tag){
 	if(tag[0] == '/'){
-		var name = tag.match(/^\/([a-zA-Z0-9]+)\s*$/)[1];
+		var name = tag.match(/^\/([-a-zA-Z0-9_]+)\s*$/)[1];
 		log('tag close for '+name);
 		var ret = makeTagOrRef(name);
 		ret.isEnd = true;
 		return ret;
 	}
-	var name = tag.match(/^([a-zA-Z0-9]+)[ \/]?/)[1];
+	var name = tag.match(/^([-a-zA-Z0-9_]+)[ \/]?/)[1];
 	log('tag name: '+name);
 	tag = tag.substring(name.length).trim();
 	var isOpen = !tag.match(/\/$/);

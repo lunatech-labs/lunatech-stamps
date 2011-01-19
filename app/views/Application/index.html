@@ -1,5 +1,9 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
+#{set 'moreScripts'}
+ <link rel="jstemplates" href="@{'/public/templates/remote-tags.html'}" type="text/html" />
+ <link rel="jstemplates" href="@{'/public/templates/remote-tags2.html'}" type="text/html" />
+#{/set}
 
 <!-- 
  Due to conflicts with Play! templates the tags are defined like this:
@@ -100,7 +104,7 @@ JSTemplates.declareTag('hello', HelloTag);
 Template reference with initial environment:
 <div id="ref1-target"></div>
 <script type="text/javascript">
- jQuery(function(){
+ JSTemplates.ready(function(){
 	jQuery("#ref1-target").jsTemplates({id: "ref1"}, {subject: 'universe!'});
  });
 </script>
@@ -114,7 +118,7 @@ Template reference with initial environment:
 Template reference with initial environment and dynamic value:
 <div id="ref2-target"></div>
 <script type="text/javascript">
- jQuery(function(){
+ JSTemplates.ready(function(){
 	var user = {firstName: "Stef", lastName: "Epardaud"};
 	user.clicky = function(){
 		alert("I was clicked: "+user.firstName);
@@ -122,4 +126,14 @@ Template reference with initial environment and dynamic value:
 	}
 	jQuery("#ref2-target").jsTemplates({id: "ref2"}, {user: user});
  });
+</script>
+
+<!-- Tag loaded automatically -->
+<script data-jstemplate="inline" type="text/html">
+ Tag loaded automatically
+ <div>~{auto-tag 'Hi!' /}</div>
+ Second tag loaded automatically in the same file
+ <div>~{auto-tag2 'Hi!' /}</div>
+ Third tag loaded automatically from another file
+ <div>~{auto-tag3 'Hi!' /}</div>
 </script>
