@@ -4,6 +4,15 @@
  <link rel="jstemplates" href="@{'/public/templates/remote-tags.html'}" type="text/html" />
  <link rel="jstemplates" href="@{'/public/templates/remote-tags2.html'}" type="text/html" />
 #{/set}
+#{set 'moreStyles'}
+<style>
+div {
+	border: 1px red solid;
+	margin: 5px;
+	padding: 5px;
+}
+</style>
+#{/set}
 
 <!-- 
  Due to conflicts with Play! templates the tags are defined like this:
