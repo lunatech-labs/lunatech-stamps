@@ -402,6 +402,14 @@ OpenTagTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 	out("~{"+tag+"}");
 };
 
+//
+// The noEval tag
+
+function NoEvalTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(NoEvalTag, Tag);
+
 // 
 // Declare the initial list of tags
 declareTag('if', IfTag);
@@ -414,6 +422,7 @@ declareTag('doBody', DoBodyTag);
 declareTag('closeScript', CloseScriptTag);
 declareTag('closeTag', CloseTagTag);
 declareTag('openTag', OpenTagTag);
+declareTag('noEval', NoEvalTag);
 
 //
 // Our cached templates
@@ -620,18 +629,44 @@ function parseTemplates(text){
 	var openExpr = undefined;
 	var openTag = undefined;
 	var openRef = undefined;
+	var openStack = [];
+	var noEval = false;
 	var lastText = 0;
 	for(var i=0;i<text.length;i++){
 		var c = text[i];
 		var hasMore = i<text.length-1;
 		var c2 = hasMore ? text[i+1] : undefined;
+		if(!noEval && (openExpr|| openTag || openRef)){
+			if(c == '('){
+				openStack.push(')');
+				continue;
+			}
+			if(c == '{'){
+				openStack.push('}');
+				continue;
+			}
+			if(c == '['){
+				openStack.push(']');
+				continue;
+			}
+			if(openStack.length > 0 && (c == ')' || c == ']' || c == '}')){
+				var closed = openStack.pop();
+				if(!closed)
+					throw "Mismatched parent: unexpected "+c;
+				if(closed != c)
+					throw "Mismatched parent: unexpected "+c+" expecting: "+closed;
+				// all is well
+				continue;
+			}
+			// continue to look for blocks
+		}
 		// Code block
-		if(c === '!' && c2 === '{'){
+		if(!noEval && c === '!' && c2 === '{'){
 			// collect text leading to this
 			currentTag.addChild(text.substring(lastText, i));
 			i++;
 			openCode = i+1;
-		}else if(openCode !== undefined && c === '}' && c2 === '!'){
+		}else if(!noEval && openCode !== undefined && c === '}' && c2 === '!'){
 			var code = text.substring(openCode, i);
 			log('Got code: '+code);
 			currentTag.addChild(new Code(code));
@@ -642,12 +677,12 @@ function parseTemplates(text){
 			openCode = undefined;
 		}
 		// Expression block
-		else if(c === '^' && c2 === '{'){
+		else if(!noEval && c === '^' && c2 === '{'){
 			// collect text leading to this
 			currentTag.addChild(text.substring(lastText, i));
 			i++;
 			openExpr = i+1;
-		}else if(openExpr !== undefined && c === '}'){
+		}else if(!noEval && openExpr !== undefined && c === '}'){
 			var expr = text.substring(openExpr, i);
 			log('Got expr: '+expr);
 			currentTag.addChild(new Expression(expr));
@@ -656,12 +691,12 @@ function parseTemplates(text){
 			openExpr = undefined;
 		}
 		// Reference block
-		else if(c === '`' && c2 === '{'){
+		else if(!noEval && c === '`' && c2 === '{'){
 			// collect text leading to this
 			currentTag.addChild(text.substring(lastText, i));
 			i++;
 			openRef = i+1;
-		}else if(openRef !== undefined && c === '}'){
+		}else if(!noEval && openRef !== undefined && c === '}'){
 			var ref = text.substring(openRef, i);
 			log('Got ref: '+ref);
 			currentTag.addChild(new Reference(ref));
@@ -681,15 +716,32 @@ function parseTemplates(text){
 			var newTag = parseTag(tag);
 			if(newTag.isEnd){
 				// we are closing the current tag
+				if(noEval){
+					if(newTag.name == 'noEval')
+						noEval = false;
+					else{
+						// ignore that closed tag and treat it as text
+						lastText = openTag - 2;
+						openTag = undefined;
+						continue;
+					}
+				}
 				if(newTag.name != currentTag.name)
 					throw "Invalid end tag "+newTag.name+" for current tag "+currentTag.name;
 				currentTag = currentTag.parent;
+			}else if(noEval){
+				// ignore that closed tag and treat it as text
+				lastText = openTag - 2;
+				openTag = undefined;
+				continue;
 			}else{
 				currentTag.addChild(newTag);
 				newTag.parent = currentTag;
 				if(newTag.isOpen){
 					// this is the start of a new tag, let's dig in
 					currentTag = newTag;
+					if(currentTag.name == 'noEval')
+						noEval = true;
 				}
 			}
 			// start collecting text after the '}'
@@ -747,6 +799,16 @@ function parseTag(tag){
 			hasAttribute = true;
 			valueStart = undefined;
 			start = i+1;
+		}else if(c == "'"){
+			if(openStack[openStack.length-1] == "'")
+				openStack.pop();
+			else
+				openStack.push("'");
+		}else if(c == '"'){
+			if(openStack[openStack.length-1] == '"')
+				openStack.pop();
+			else
+				openStack.push('"');
 		}else if(c == '('){
 			openStack.push(')');
 		}else if(c == '{'){
@@ -756,9 +818,9 @@ function parseTag(tag){
 		}else if(c == ')' || c == ']' || c == '}'){
 			var closed = openStack.pop();
 			if(!closed)
-				throw "Mismatched parent: unexpected "+c;
+				throw "Mismatched paren: unexpected "+c;
 			if(closed != c)
-				throw "Mismatched parent: unexpected "+c+" expecting: "+closed;
+				throw "Mismatched paren: unexpected "+c+" expecting: "+closed;
 			// all is well
 		}
 	}
