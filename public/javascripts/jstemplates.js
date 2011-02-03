@@ -199,6 +199,32 @@ ListTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 };
 
 //
+// The jQuery tag
+
+function jQueryTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(jQueryTag, Tag);
+
+jQueryTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	var query = jQuery(env.evalExpression(this.attributes.selector));
+	var v = env.evalExpression(this.attributes['var']);
+	var vList = v+"_jQuery";
+	var vIndex = v+"_index";
+	env.evalStatement("var "+vList+";");
+	env.setVariable(vList, query);
+	var tag = this;
+	query.each(function (index, elem){
+		env.preserve();
+		env.evalStatement("var "+vIndex+", "+v+";");
+		env.setVariable(vIndex, index);
+		env.setVariable(v, jQuery(elem));
+		tag.recursiveOutput(out, env);
+		env.restore();
+	});
+};
+
+//
 // Future tag
 
 function FutureTag(name, attributes){
@@ -334,6 +360,7 @@ DoBodyTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 declareTag('if', IfTag);
 declareTag('else', ElseTag);
 declareTag('list', ListTag);
+declareTag('jQuery', jQueryTag);
 declareTag('future', FutureTag);
 declareTag('timer', TimerTag);
 declareTag('doBody', DoBodyTag);
