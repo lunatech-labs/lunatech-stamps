@@ -186,12 +186,15 @@ ListTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 	var v = env.evalExpression(this.attributes['var']);
 	var vList = v+"_list";
 	var vIndex = v+"_index";
-	env.evalStatement("var "+vList+', '+vIndex+", "+v);
+	env.evalStatement("var "+vList+";");
 	env.setVariable(vList, l);
 	for(var i = 0 ; i < l.length ; i++){
+		env.preserve();
+		env.evalStatement("var "+vIndex+", "+v+";");
 		env.setVariable(vIndex, i);
 		env.setVariable(v, l[i]);
 		this.recursiveOutput(out, env);
+		env.restore();
 	}
 };
 
