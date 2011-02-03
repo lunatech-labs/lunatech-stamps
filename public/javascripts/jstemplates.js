@@ -609,6 +609,8 @@ function processTemplates(text, env){
 	return evalTemplate(tag, new Environment(env));
 }
 
+JSTemplates.__processTemplates = processTemplates;
+
 function parseTemplates(text){
 	// start with a tag
 	var currentTag = new Tag('main');
