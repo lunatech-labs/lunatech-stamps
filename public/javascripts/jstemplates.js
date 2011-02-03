@@ -364,6 +364,44 @@ DoBodyTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 	body.recursiveOutput(out, env);
 };
 
+//
+// The closeScript tag
+
+function CloseScriptTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(CloseScriptTag, Tag);
+
+CloseScriptTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	out("</script>");
+};
+
+//
+// The closeTag tag
+
+function CloseTagTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(CloseTagTag, Tag);
+
+CloseTagTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	var tag = env.evalExpression(this.attributes._arg);
+	out("~{/"+tag+"}");
+};
+
+//
+// The openTag tag
+
+function OpenTagTag(name, attributes){
+	Tag.apply(this, [name, attributes]);
+}
+extend(OpenTagTag, Tag);
+
+OpenTagTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	var tag = env.evalExpression(this.attributes._arg);
+	out("~{"+tag+"}");
+};
+
 // 
 // Declare the initial list of tags
 declareTag('if', IfTag);
@@ -373,6 +411,9 @@ declareTag('jQuery', jQueryTag);
 declareTag('future', FutureTag);
 declareTag('timer', TimerTag);
 declareTag('doBody', DoBodyTag);
+declareTag('closeScript', CloseScriptTag);
+declareTag('closeTag', CloseTagTag);
+declareTag('openTag', OpenTagTag);
 
 //
 // Our cached templates
