@@ -347,10 +347,19 @@ function DoBodyTag(name, attributes){
 extend(DoBodyTag, Tag);
 
 DoBodyTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	var savedOut = out;
 	// we must obtain the body of the current tag's invocation
 	var body = env.getContext('body');
 	if(!body)
 		throw "Invalid doBody tag: not invoked via simple tag";
+	if(this.attributes.escape){
+		var escape = env.evalExpression(this.attributes.escape);
+		if(escape){
+			out = function(str){
+				savedOut(str.replace(/</g, '&lt;'));
+			};
+		}
+	}
 	// and invoke it as if it were located here
 	body.recursiveOutput(out, env);
 };
