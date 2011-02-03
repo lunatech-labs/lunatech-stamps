@@ -1,0 +1,531 @@
+#{extends 'main.html' /}
+#{set title:'JSTemplates docs' /}
+#{set 'moreScripts'}
+ <script type="text/javascript">
+  var tocHidden = true;
+  function toggleToc(){
+	  var toc = jQuery(".toc");
+	  if(tocHidden)
+		toc.animate({left: document.width - 300});
+	  else
+	  	toc.animate({left: document.width - 15});
+	  tocHidden = !tocHidden;
+  }
+ </script>
+#{/set}
+#{set 'moreStyles'}
+ <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/docs.css'}">
+#{/set}
+
+<script data-jstemplate="inline" type="text/html">
+ <div class="toc" style="left: ^{document.width - 15}px">
+  <table>
+   <tr>
+    <td class="toggle" onclick="toggleToc()">T<br/>O<br/>C</td>
+    <td>
+  <ul>
+   <li><a href="#">Top</a></li>
+  ~{jQuery selector: ".para .title, h1", var: 'el'}
+   !{ 
+     var t = el.text();
+     el.attr('id', t);
+   }!
+   <li class="^{el.is('h1') ? 'level2': ''}"><a href="#^{t}">^{t}</a></li>
+  ~{/jQuery}
+  </ul>
+   </td>
+  </tr>
+  </table>
+ </div>
+</script>
+
+<div class="titlebox">
+ <div class="title">JSTemplates</div>
+ <div class="subtitle">Client-side templates for an easy life</div>
+</div>
+
+<div class="para">
+ <div class="title">What is JSTemplates</div>
+ <div class="body">
+  <p>
+  JSTemplates is a client-side templating library similar to Play! Framework's server-side Groovy templates,
+  but on the client, in pure JavaScript.
+  </p>
+  
+  <h1>Why not user server-side templates?</h1>
+  
+  <p>
+   With server-side templates, you serve pages by loading data from the database, then produce HTML pages
+   using templates, then ship those pages to the client. This has the following drawbacks:
+  </p>
+  
+  <ul>
+   <li><div>
+     Template-processing uses CPU time which can impact scaling. On the other hand, the clients often have
+     multi-core CPUs doing nothing most of the time. We can distribute the cost of rendering pages to the clients.
+   </div></li>
+   <li><div>
+     Generating pages on the server increases the bandwidth necessary to serve pages, since we're sending a lot
+     of HTML that is generated from data we load from the database. If we can send the data directly to the client
+     and the client can generate the HTML, we can gain on bandwidth to serve the pages.
+   </div></li>
+   <li><div>
+     If you generate a list of items on the server using templates, it is hard to add elements to that list on
+     the client using AJAX, because the rendering logic is on the server, which means you have to duplicate it
+     on the client.
+   </div></li>
+  </ul>
+  
+  <p>
+   Add to that the fact that when doing AJAX, you always end up creating lots of HTML on the client using ad-hoc
+   means, most of the time either DOM manipulation or using jQuery, and that leads to ugly clumbsy code that is
+   hard to maintain. This is the exact reason why the servers switched from that sort of rendering to templating
+   long ago, which is still largely unused on the client, unfortunately.
+  </p>
+
+  <h1>Why can client-side templates do for me?</h1>
+  
+  <p>
+   In addition to all the benefits we already discussed, client-side templates bring a number of unique features
+   that are not possible on server-side templates: 
+  </p>
+
+  <ul>
+   <li><div>
+    Template expressions and statements written in JavaScript, and not a dreadful sub-language such as UEL or
+    a third language such as Groovy (supposing the server is written in Java and the client in JavaScript).
+   </div></li>
+   <li><div>
+    The ability to introduce dynamic elements in the template, such as futures (parts of the template whose rendering
+    is delayed until a certain resource arrives from the server in the background) or timed updates (being able
+    to re-render parts of a template at specific time intervals), or even being able to use template evaluation-time
+    values at run-time (functions produced by the template, used in <i>onclick</i> handlers).
+   </div></li>
+   <li><div>
+    Define new template tags for new behaviour, either programatically for complex behaviour, or declaratively by
+    simply giving a name to a template part.
+   </div></li>
+   <li><div>
+    Apply templates on a page automatically, or by invoking an API for dynamic updates.
+   </div></li>
+  </ul>
+ </div>
+</div>
+
+<script type="text/javascript">
+ var example = 1;
+</script>
+
+<script name="example" data-jstemplate="tag" type="text/html">
+  <table class="example">
+   <tr>
+    <th class="program">JSTemplates</th>
+    <th class="result">Result source</th>
+    <th>Result</th>
+   </tr>
+   <tr>
+   <td class="program">
+    <code><pre>~{doBody escape: true/}</pre></code>
+    <script id="ex^{example}" type="text/html">~{doBody/}~{closeScript/}
+   </td>
+   <td class="result">
+    <script type="text/javascript">
+     var template = jQuery("#ex^{example}").html();
+     console.log("got template" + template);
+     var result = JSTemplates.__processTemplates(template);
+     result = result.replace(/\n( *\n)+/g, "\n");
+     jQuery("#ex^{example}-res").text(result);
+     jQuery("#ex^{example}-res-eval").html(result);
+    ~{closeScript/}
+    <code><pre id="ex^{example}-res"></pre></code>
+   </td>
+   <td class="result-eval" id="ex^{example}-res-eval">
+   </td>
+  </tr>
+ </table>
+ !{ example++; }!
+</script>
+
+<div class="para">
+ <div class="title">Templates examples</div>
+ <div class="body">
+  <h1>Expressions</h1>
+  <p>
+  Here is our first example of using JSTemplates where we use the <tt>^{ expr }</tt> notation to inject the result
+  of a JavaScript expression in the template result:
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}Here is the current date: 
+^{new Date().toLocaleString()}~{/noEval}~{/example}
+  </script>
+
+  <h1>Tags</h1>
+  <p>
+   Tags in JSTemplates are invoked with the <tt>~{ tag attr: val, attr: val... }</tt> notation and closed with
+   <tt>~{/ tag }</tt> and can be used for complex behaviour such as iterating lists:
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}<ul>
+ ~{list items: [1,2,3,4,5], var: 'i'}
+  <li>Item ^{i}</li>
+ ~{/list}
+</ul>~{/noEval}~{/example}
+  </script>
+  <p>
+   There are a number of predefined tags, and of course you can define your own tags easily, which we will see later.
+  </p>
+
+  <h1>Code blocks</h1>
+  <p>
+   Code blocks are very powerful in JSTemplates since they allow you to execute JavaScript statements during
+   template evaluation. They are defined with <tt>!{ statement... }!</tt> notation:
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}!{ var count = 0; }!
+<ul>
+ ~{list items: [1,2,3,4,5], var: 'i'}
+  !{ count++; }!
+  <li>Item ^{i}</li>
+ ~{/list}
+</ul>
+Total: ^{count}~{/noEval}~{/example}
+  </script>
+
+  <h1>Dynamic expressions</h1>
+  <p>
+   Dynamic expressions let you use expressions defined at template-evaluation time in the code that is
+   executed at run-time. The most common usage is to define (or get a hold of) a function at template-evaluation
+   time, and want to be able to call this function as an <i>onclick</i> handler in the generated HTML. You write
+   this with this syntax: <tt>`{ expression }</tt>.
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}<ul>
+ ~{list items: [1,2,3,4,5], var: 'i'}
+  <li>
+   !{
+     var f = function(){ 
+      alert(i);
+      return false;
+     }
+   }!
+   <a href="#" 
+      onclick="return `{f}();"
+     >Click me</a>
+  </li>
+ ~{/list}
+</ul>~{/noEval}~{/example}
+  </script>
+ </div>
+</div>
+
+<div class="para">
+ <div class="title">Invoking templates</div>
+ <div class="body">
+  <h1>Inline</h1>
+  <p>
+   Any <tt>script</tt> elements of type <tt>text/html</tt>, with the <tt>data-jstemplate</tt> 
+   attribute set to <tt>inline</tt> will be evaluated by JSTemplates and replaced inline:
+  </p>
+  <table class="example">
+   <tr>
+    <th class="program">HTML</th>
+    <th>Result</th>
+   </tr>
+   <tr>
+   <td class="program">
+    <code><pre>&lt;script type="text/html" data-jstemplate="inline">
+ ^{new Date().toLocaleString()}
+&lt;/script>
+</pre></code>
+   </td>
+   <td class="result">
+    <script type="text/html" data-jstemplate="inline">
+     ^{new Date().toLocaleString()}
+    </script>
+   </td>
+  </tr>
+ </table>
+
+  <h1>Programmatically</h1>
+  <p>
+   You can invoke any simple tag programmatically and replace an element with the template's output, or just
+   retrieve the template output. An optional argument contains the initial environment of the template, where
+   you can pass any JavaScript values that will be visible inside the template (on top of the JavaScript global
+   scope).
+  </p>
+  <table class="example">
+   <tr>
+    <th class="program">HTML</th>
+   </tr>
+   <tr>
+   <td class="program">
+    <code><pre>&lt;script type="text/javascript">
+	// Those will replace the content of #output with the result of the template evaluation
+	// for a template reference
+	JSTemplates.loadTemplate("output", {id: "hello"}, /* optional */ {_arg: "World"});
+	
+	// Or using the jQuery plugin:
+	jQuery("#output").jsTemplates({id: "hello"}, /* optional */ {_arg: "World"});
+	
+	// Or if you just want the html:
+	var html = JSTemplates.applyTemplate("hello", /* optional */ {_arg: "World"});
+&lt;/script>
+</pre></code>
+   </td>
+   </tr>
+  </table>
+ </div>
+</div>
+
+<script name="doc" data-jstemplate="tag" type="text/html">
+  <table class="doc">
+   <tr class="tag">
+    <th>Tag</th>
+    <td>^{_tag}</td>
+   </tr>
+   ~{if _attributes}
+    ~{list items: Object.keys(_attributes), var: 'attr'}
+     <tr class="attribute">
+      <th>Attribute ^{attr}</th>
+      <td>^{_attributes[attr]}</td>
+    </tr>
+    ~{/list}
+   ~{/if}
+   ~{if _attribute}
+   <tr class="attribute">
+    <th>Attribute</th>
+    <td>^{_attribute}</td>
+   </tr>
+   ~{/if}
+   <tr class="body">
+    <th>Body</th>
+    <td>^{_body ? 'required' : 'no'}</td>
+   </tr>
+   <tr class="doc">
+    <th>Description</th>
+    <td>~{doBody/}</td>
+   </tr>
+ </table>
+</script>
+
+
+<div class="para">
+ <div class="title">Predefined tags</div>
+ <div class="body">
+  <script data-jstemplate="inline" type="text/html">
+    ~{doc tag: 'if', attribute: 'boolean expression', body: true}
+     If the boolean expression evaluates to a <i>truish</i> value, the body of the tag is evaluated. Otherwise
+     it is discarded. 
+    ~{/doc}
+  </script>
+  <h1>if</h1>
+  <p>
+   Write conditionals with the <tt>if</tt> tag.
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}~{if 1 == 2}
+ This is false.
+~{/if}
+
+~{if true}
+ This is true.
+~{/if}
+~{/noEval}~{/example}
+  </script>
+
+  <script data-jstemplate="inline" type="text/html">
+    ~{doc tag: 'else', body: true}
+     If the previous <tt>if</tt> tag's boolean expression evaluates to a <i>false</i> value, the body of the 
+     tag is evaluated. Otherwise it is discarded. 
+    ~{/doc}
+  </script>
+  <h1>else</h1>
+  <p>
+   Optional tag to go with the <tt>if</tt> tag.
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}~{if 1 == 2}
+ This is false.
+~{/if}
+~{else}
+ One is not two.
+~{/else}
+
+~{if true}
+ This is true.
+~{/if}
+~{else}
+ The test failed.
+~{/else}
+~{/noEval}~{/example}
+  </script>
+
+  <script data-jstemplate="inline" type="text/html">
+    ~{doc tag: 'list', 
+          attributes: {items: 'An array expression to iterate', 
+                       var: 'The name of the variable to hold each iterated item'}, 
+          body: true}
+     Evaluates the body once for each item in the <tt>items</tt> attribute, each time defining the
+     <tt>var</tt> variable to hold the iterated element. An extra <tt>var_index</tt> variable is defined
+     to hold the current iteration number.
+    ~{/doc}
+  </script>
+  <h1>list</h1>
+  <p>
+   Iterate over arrays with the <tt>list</tt> tag.
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}<ul>
+ ~{list items: ["blue","green","red"], var: "color"}
+  <li>^{color_index}: ^{color}</li>
+ ~{/list}
+</ul>~{/noEval}~{/example}
+  </script>
+
+  <script data-jstemplate="inline" type="text/html">
+    ~{doc tag: 'jQuery', 
+          attributes: {selector: 'A jQuery selector to iterate', 
+                       var: 'The name of the variable to hold each iterated item'}, 
+          body: true}
+     Evaluates the body once for each item that matches the jQuery <tt>selector</tt> attribute, 
+     each time defining the <tt>var</tt> variable to hold the iterated element's jQuery wrapper. 
+     An extra <tt>var_index</tt> variable is defined
+     to hold the current iteration number.
+    ~{/doc}
+  </script>
+  <h1>jQuery</h1>
+  <p>
+   Iterate over jQuery selectors with the <tt>jQuery</tt> tag.
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}<ul>
+ ~{jQuery selector: "h1", var: "header"}
+  <li>^{header_index}: ^{header.text()}</li>
+ ~{/jQuery}
+</ul>~{/noEval}~{/example}
+  </script>
+
+  <script data-jstemplate="inline" type="text/html">
+    ~{doc tag: 'timer', 
+          attribute: 'an integer expression defining the number of milliseconds for each update', 
+          body: true}
+     Evaluates the body and re-evaluates it every <tt>X</tt> milliseconds.
+    ~{/doc}
+  </script>
+  <h1>timer</h1>
+  <p>
+   Refresh parts of your document every <tt>X</tt> milliseconds with the <tt>timer</tt> tag.
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}~{timer 5000}
+^{new Date().toLocaleString()}
+~{/timer}~{/noEval}~{/example}
+  </script>
+
+  <script data-jstemplate="inline" type="text/html">
+    ~{doc tag: 'noEval', 
+          body: true}
+     Outputs the body with no JSTemplate interpretation. Use this if you want to output code that would
+     otherwise be intepreted as JSTemplate.
+    ~{/doc}
+  </script>
+  <h1>noEval</h1>
+  <p>
+   Output non-evaluated template code with the <tt>noEval</tt> tag.
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{openTag 'noEval'/}~{noEval}
+^{new Date().toLocaleString()}
+~{/noEval}~{closeTag 'noEval'/}~{/example}
+  </script>
+ </div>
+</div>
+
+<div class="para">
+ <div class="title">Writing new tags</div>
+ <div class="body">
+  <h1>Simple tags</h1>
+  <p>
+   Define your simple tags with <tt>script</tt> elements of type <tt>text/html</tt>, the <tt>data-jstemplate</tt> 
+   attribute set to <tt>tag</tt> and the <tt>name</tt> attribute to set the name of the new simple tag.
+  </p>
+  <p>
+   The simple tag's attributes are prefixed with a "<tt>_</tt>", and if there is a default attribute it is available
+   as <tt>_arg</tt>. You can refer to the tag's body with <tt>~{doBody/}</tt>:
+  </p>
+  <table class="example">
+   <tr>
+    <th class="program">HTML</th>
+    <th>Example</th>
+   </tr>
+   <tr>
+   <td class="program">
+    <code><pre>&lt;script type="text/html" data-jstemplate="tag" name="foo">
+ Default argument: ^{_arg}&ltbr/>
+ Named argument: ^{_item}&ltbr/>
+ Body: ~{doBody/}
+&lt;/script>
+</pre></code>
+   </td>
+   <td class="result">
+<code><pre>
+ ~{foo 'default arg goes here'}Body goes there~{/foo}
+ ~{foo item: 'named arg goes here'/}
+</pre></code>
+   </td>
+  </tr>
+ </table>
+  
+  <h1>Programmatically</h1>
+  <p>
+   You must define a subtype of <tt>JSTemplates.Tag</tt>, and register it in JSTemplates so it can find it:
+  </p>
+  <table class="example">
+   <tr>
+    <th class="program">HTML</th>
+   </tr>
+   <tr>
+   <td class="program">
+    <code><pre>&lt;script type="text/javascript">
+ // define our new tag type
+ function HelloTag(name, attributes){
+	JSTemplates.Tag.apply(this, [name, attributes]);
+ }
+ // make sure it inherits methods from JSTemplates.Tag
+ JSTemplates.extend(HelloTag, JSTemplates.Tag);
+
+ // and implement its behaviour
+ HelloTag.prototype.outputInNewEnv = function(out, previousSibling, env){
+	// when we do not name the attributes, the default is "_arg"
+	// we evaluate the contents of the attribute in the current environment
+	var string = env.evalExpression(this.attributes._arg);
+	// and we write it out
+	out('Hello ' + string);
+ };
+
+ // register this new tag in JSTemplates
+ JSTemplates.declareTag('hello', HelloTag);
+&lt;/script>
+</pre></code>
+   </td>
+   </tr>
+  </table>
+
+  <h1>Loading templates from the network</h1>
+  <p>
+   You can load simple tags from the network, just like you can load JavaScript and CSS, by placing them into
+   a file and adding the following <tt>link</tt> elements to your document <tt>head</tt>:
+  </p>
+  <table class="example">
+   <tr>
+    <th class="program">HTML</th>
+   </tr>
+   <tr>
+   <td class="program">
+    <code><pre>&lt;link rel="jstemplates" href="/templates/my-tags.html" type="text/html" /></pre></code>
+   </td>
+   </tr>
+  </table>
+ </div>
+</div>
+
