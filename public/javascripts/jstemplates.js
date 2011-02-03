@@ -913,7 +913,13 @@ Environment.prototype.evalStatement = function(stmt){
 }
 
 Environment.prototype.evalExpression = function(e){
-	return this.env(e, true);
+	try{
+		return this.env(e, true);
+	}catch(e){
+		if(e instanceof ReferenceError)
+			return undefined;
+		throw e;
+	}
 }
 
 Environment.prototype.setVariable = function(v, e){
