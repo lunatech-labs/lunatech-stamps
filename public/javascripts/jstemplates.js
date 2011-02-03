@@ -528,10 +528,13 @@ function autoProcess2(){
 		UserTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 			// we start by defining the variables passed to us
 			var evaluatedAttributes = {};
+			var hasOne = false;
 			for(var attribute in this.attributes){
 				evaluatedAttributes[attribute] = env.evalExpression(this.attributes[attribute]);
+				hasOne = true;
 			}
-			env.declareVariables(evaluatedAttributes);
+			if(hasOne)
+				env.declareVariables(evaluatedAttributes);
 			// then we let the 'doBody' tag know that we hold the body
 			env.pushContext('body', this);
 			// now proceed with the tag body
