@@ -4,15 +4,19 @@
     <head>
         <title>#{get 'title' /}</title>
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/main.css'}">
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/styles/jstemplates/base.css'}">
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/styles/jstemplates/forms.css'}">
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/styles/jstemplates/app.css'}">
         #{get 'moreStyles' /}
-        <link rel="shortcut icon" type="image/png" href="@{'/public/images/favicon.png'}">
-        <script src="@{'/public/javascripts/jquery-1.4.2.min.js'}" type="text/javascript" charset="utf-8"></script>
-        <script src="@{'/public/javascripts/date-iso8601.js'}" type="text/javascript" charset="utf-8"></script>
-        <script src="@{'/public/javascripts/jstemplates.js'}" type="text/javascript" charset="utf-8"></script>
+        <link rel="shortcut icon" type="image/png" href="@{'/public/styles/jstemplates/images/favicon.png'}">
+        <script src="@{'/public/scripts/jquery-1.4.2.min.js'}" type="text/javascript" charset="utf-8"></script>
+        <script src="@{'/public/scripts/date-iso8601.js'}" type="text/javascript" charset="utf-8"></script>
+        <script src="@{'/public/scripts/jstemplates.js'}" type="text/javascript" charset="utf-8"></script>
         #{get 'moreScripts' /}
     </head>
     <body>
-        #{doLayout /}
+        <div id="site">
+            #{doLayout /}
+        </div>
     </body>
 </html>

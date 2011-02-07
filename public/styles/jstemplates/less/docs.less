@@ -1,0 +1,177 @@
+/*  ###########################################################################
+    Author:     Lunatech
+    date:       Fabruary 2011
+    ########################################################################### */
+
+    
+    @import "lib.less";
+    
+    
+    h1 {
+        position: absolute;
+        top:0;
+        z-index: 100;
+        margin-top: @base-height/2;
+    	width: auto;
+    	padding: 0 @body-whitespace;
+        color: @light-color;
+/*     	background: @dark-color; */
+        }
+    h1 .product-name {
+        font-size: 2em;
+        font-family: @fonts-header;
+        }
+    h1 .product-name span {
+        color: orange;
+        }
+    h1 .tagline {
+        padding: 0 0 0 4.6em;
+        font-size: 0.5em;
+        }
+
+    h2 {
+        margin-top: 3em;
+        font-size: 2em;
+        font-family: @fonts-header;
+        }
+    h3 {
+        margin-top: 1em;
+        }
+    
+    
+    .example li {
+    	color: black;
+    	margin-top: 3px;
+    	margin-bottom: 3px;
+    }
+    
+    li > div {
+    	color: black;
+    }
+    .body p { max-width: 740px; }
+    .example {
+        .rounded-corners(3px);
+    	width: 100%;
+    	background: white;
+    	overflow:hidden;
+    }
+    
+    .example td {
+    	width: 33%;
+    	padding: 5px 10px;
+    }
+    .example th {
+        font-weight: bold;
+        font-size: 0.75em;
+        text-transform: uppercase;
+        color: @light-color;
+        background: @dark-color;
+    	padding: 3px 10px;
+        }
+    .example td.program,
+    .example td.result {
+        border-right: 1px solid @light-color;
+        background: @blue3;
+    }
+    .example .result-eval {
+        color: white;
+        background: orange;
+        }
+    table.doc {
+    	float: right;
+        .rounded-corners(3px);
+    	width: 50%;
+        margin: 1em 0;
+    	background: #FDF3C6;
+    }
+    
+    table.doc th {
+    	text-align: right;
+    }
+    
+    table.doc .tag td {
+    	font-weight: bold;
+    	font-family: monospace;
+    }
+    
+    table.doc th,
+    table.doc td {
+    	padding: 5px 10px;
+    }
+    
+    pre { font-family: monospace;}
+    
+    .toc {
+/*         position: absolute; */
+        top:0;
+    	width: 960px;
+    	min-height: 96px;
+    	background: @dark-color;
+        overflow: hidden;
+        }
+    
+    .toc table {
+    	margin: 0;
+    	width: 960px;
+    	background: @dark-color;
+    }
+    .toc td {
+        padding: @base-height 0 @base-height 40%;
+     	width: 960px - (@base-height*2);
+     	
+       }
+    .toc ul {
+    	margin: 0;
+        -moz-column-count: 2; -moz-column-gap: 1em; 
+        -webkit-column-count: 2; -webkit-column-gap: 1em; 
+    	min-height: 16.5em;
+        }
+    
+    .toc li {
+    	list-style: none;
+    	width: 100%;
+    	margin-top: 2px;
+    	margin-bottom: 2px;
+    	font-weight: bold;
+        }
+    .toc > li {
+        break-after: column;
+        }
+    
+    .toc li.level2 {
+    	padding-left: @base-height;
+    	font-weight: normal;
+    }
+    
+    .toc li a {
+    	text-decoration: none;
+    	color: @light-color;
+    	width: 100%;
+    	display: inline-block;
+    }
+    
+    .toc li a:hover {
+        color: orange;
+    }
+    
+    .toggle {
+        display: block;
+        .rounded-corners-bottom(@rad);
+    	width: 960px - @base-width;
+    	font-size: 0.75em;
+    	text-align: right;
+    	letter-spacing: 1px;
+        margin-bottom: 4em;
+    	padding: 0 @body-whitespace;
+    	height: 16px;
+    	cursor: pointer;
+    	color: @light-color;
+        .gradient(@dark-color,@grey2)
+    }
+    .toggle:visited {
+    	color: @light-color;
+        }
+    .toggle:hover {
+    	color: @dark-color;
+    	background: orange;
+    }

@@ -1,0 +1,83 @@
+/*  ###########################################################################
+    Author:     Lunatech
+    date:       January 2011
+    ########################################################################### */
+    
+    
+    //  LESS LIBRARY ##########################################################
+    //  THESE ARE THE VARIABLES TO SKIN THIS PROJECT
+
+
+    @light-color:       #ffffff;
+    @dark-color:        #222222;
+    
+    @grey0:             #efefef;
+    @grey1:             #aaaaaa;
+    @grey2:             #555555;
+    @grey3:             #999999;
+    @grey4:             #cccccc;
+    @grey5:             #d3d3d3;
+    @grey6:             #363636;
+    
+    @blue1:             #7abcff;
+    @blue2:             darken(@blue1, 15%);
+    @blue3:             lighten(@blue1, 20%);
+    
+    @green1:            #57c26c;
+    @green2:            darken(@green1, 15%);
+    
+    @yellow1:           #ffe362;
+    @yellow2:           darken(@yellow1, 25%);
+    
+    @red1:              #f83f21;
+    @red2:              darken(@red1, 15%);
+    
+    @grey-text:         #222222;
+    @grey-text-active:  #212121;
+    
+    @error:             #cd0a0a;
+    
+    @fonts:             Arial, Helvetica, sans-serif;
+    @fonts-header:      "RalewayThin", Arial, Helvetica, sans-serif;
+    @fonts-header-bold: "RalewayThin", Arial, Helvetica, sans-serif;
+
+    @base-height:        1.4em;
+    @base-width:        48px;
+    @body-whitespace:   @base-width / 2;
+    @rad:               @base-width * 0.125; 
+    @rad:               @base-width * 0.125; 
+    
+    @line:              1px;
+    @top:               -1px;
+    @bottom:            1px;
+    
+    .text-shadow(@loc, @color) {
+        text-shadow: 0 @loc @line @color;
+        }
+    .box-shadow(@color) {
+        -moz-box-shadow: 0 @line 0 @color;
+        -webkit-box-shadow: 0 @line 0 @color;
+        box-shadow: 0 @line 0 @color;
+        }
+    .gradient(@start,@stop){
+        background: @start; /* old browsers */
+        background: -moz-linear-gradient(top, @start 0%, @stop 100%); /* firefox */
+        background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@start), color-stop(100%,@stop)); /* webkit */
+        filter: e("progid:DXImageTransform.Microsoft.Gradient( StartColorStr=")@start e(", EndColorStr=")@stop e(",GradientType=0 )");/* ie" */
+        -ms-filter: e("progid:DXImageTransform.Microsoft.Gradient( StartColorStr=")@start e(", EndColorStr=")@stop e(",GradientType=0 )");/* ie8" */
+        /* TODO:no idea what IE9 does */
+        }   
+
+    .rounded-corners(@rad) {
+        -moz-border-radius:@rad;
+        -webkit-border-radius:@rad;
+        border-radius:@rad;
+        }
+    .rounded-corners-bottom(@rad) {
+        -webkit-border-bottom-right-radius: @rad;
+        -webkit-border-bottom-left-radius: @rad;
+        -moz-border-radius-bottomright: @rad;
+        -moz-border-radius-bottomleft: @rad;
+        border-bottom-right-radius: @rad;
+        border-bottom-left-radius: @rad;        }
+
