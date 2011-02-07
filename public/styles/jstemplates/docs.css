@@ -1,5 +1,5 @@
 h1{position:absolute;top:0;z-index:100;margin-top:0.7em;width:auto;padding:0 24px;color:#ffffff;}
-h1 .product-name{font-size:2em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
+h1 .product-name{font-size:1.9em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
 h1 .product-name span{color:orange;}
 h1 .tagline{padding:0 0 0 4.6em;font-size:0.5em;}
 h2{margin-top:3em;font-size:2em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
@@ -18,7 +18,7 @@ table.doc .tag td{font-weight:bold;font-family:monospace;}
 table.doc th,table.doc td{padding:5px 10px;}
 pre{font-family:monospace;}
 .toc{top:0;width:960px;min-height:96px;background:#222222;overflow:hidden;}
-.toc table{margin:0;width:960px;background:#222222;}
+.toc table{margin:0.5em 0 0 0;width:960px;background:#222222;}
 .toc td{padding:1.4em 0 1.4em 40%;width:957.2px;}
 .toc ul{margin:0;-moz-column-count:2;-moz-column-gap:1em;-webkit-column-count:2;-webkit-column-gap:1em;min-height:16.5em;}
 .toc li{list-style:none;width:100%;margin-top:2px;margin-bottom:2px;font-weight:bold;}
