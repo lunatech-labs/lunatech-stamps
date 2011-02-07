@@ -1,8 +1,8 @@
 h1{position:absolute;top:0;z-index:100;margin-top:0.7em;width:auto;padding:0 24px;color:#ffffff;}
-h1 .product-name{font-size:2em;font-family:"RalewayThin",Arial,Helvetica,sans-serif;}
+h1 .product-name{font-size:2em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
 h1 .product-name span{color:orange;}
 h1 .tagline{padding:0 0 0 4.6em;font-size:0.5em;}
-h2{margin-top:3em;font-size:2em;font-family:"RalewayThin",Arial,Helvetica,sans-serif;}
+h2{margin-top:3em;font-size:2em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
 h3{margin-top:1em;}
 .example li{color:black;margin-top:3px;margin-bottom:3px;}
 li>div{color:black;}
