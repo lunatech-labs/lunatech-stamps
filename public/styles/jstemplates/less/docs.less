@@ -14,7 +14,7 @@
         position: absolute;
         top:0;
         z-index: 100;
-        margin-top: @base-height/2;
+        margin-top: @base-height/3;
     	width: auto;
     	padding: 0 @body-whitespace;
         color: @light-color;
@@ -23,6 +23,7 @@
     h1 .product-name {
         font-size: 1.9em;
         font-family: @fonts-header;
+        color: @light-color;
         }
     h1 .product-name span {
         color: orange;
@@ -31,6 +32,7 @@
         padding: 0 0 0 4.6em;
         font-size: 0.5em;
         }
+
     .para { display: none; }
     h1+.para {
         display: block;
@@ -42,10 +44,16 @@
         font-family: @fonts-header;
         }
     h3 {
-        margin-top: 1em;
+        padding-top: 1em;
         }
     
-    .active { background: orange; }
+    h3.active { 
+        margin-left: -40px;
+        padding-left: 40px;
+        width: 960px + 40px;
+        font-weight: bold;
+        background: transparent url(images/arrow-next.png) no-repeat 0 80%;
+        }
     .example li {
     	color: black;
     	margin-top: 3px;
@@ -90,6 +98,7 @@
     	width: 50%;
         margin: 1em 0;
     	background: #FDF3C6;
+    	overflow: hidden;
     }
     
     table.doc th {
@@ -111,29 +120,20 @@
     .toc {
         position: relative;
         top:0;
-        .rounded-corners-bottom(@rad);
     	width: 960px;
-    	min-height: 90px;
+    	height: 106px;
     	background: @dark-color;
         overflow: hidden;
         }
     
-    .toc table {
-    	margin: 0 0 0 0;
-    	width: 960px;
-    	height: 150px;
-    	background: @dark-color;
-    }
-    .toc td {
-        padding: @base-height 0 @base-height 40%;
-     	width: 960px - (@base-height*2);
-     	
-       }
     .toc ul {
+        position: relative;
     	margin: 0;
+    	display: none;
+        padding: @base-height 0 0 40%;
         -moz-column-count: 2; -moz-column-gap: 1em; 
         -webkit-column-count: 2; -webkit-column-gap: 1em; 
-    	min-height: 16.5em;
+    	height: 260px;
         }
     
     .toc li {
@@ -142,9 +142,6 @@
     	margin-top: 2px;
     	margin-bottom: 2px;
     	font-weight: bold;
-        }
-    .toc > li {
-        break-after: column;
         }
     
     .toc li.level2 {
@@ -165,10 +162,8 @@
     }
     
     .toggle {
-        position: relative;
-        bottom: 0;
         display: block;
-        margin: 106px 0 0 0;
+        margin: 0;
         .rounded-corners-bottom(@rad);
     	width: 960px - @base-width;
     	font-size: 0.75em;

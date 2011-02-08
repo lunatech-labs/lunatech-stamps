@@ -1,12 +1,12 @@
-h1{position:absolute;top:0;z-index:100;margin-top:0.7em;width:auto;padding:0 24px;color:#ffffff;}
-h1 .product-name{font-size:1.9em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
+h1{position:absolute;top:0;z-index:100;margin-top:0.4666666666666666em;width:auto;padding:0 24px;color:#ffffff;}
+h1 .product-name{font-size:1.9em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;color:#ffffff;}
 h1 .product-name span{color:orange;}
 h1 .tagline{padding:0 0 0 4.6em;font-size:0.5em;}
 .para{display:none;}
 h1+.para{display:block;}
 h2{margin-top:1em;font-size:2em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
-h3{margin-top:1em;}
-.active{background:orange;}
+h3{padding-top:1em;}
+h3.active{margin-left:-40px;padding-left:40px;width:1000px;font-weight:bold;background:transparent url(images/arrow-next.png) no-repeat 0 80%;}
 .example li{color:black;margin-top:3px;margin-bottom:3px;}
 li>div{color:black;}
 .body p{max-width:740px;}
@@ -15,20 +15,17 @@ li>div{color:black;}
 .example th{font-weight:bold;font-size:0.75em;text-transform:uppercase;color:#ffffff;background:#222222;padding:3px 10px;}
 .example td.program,.example td.result{border-right:1px solid #ffffff;background:#e0efff;}
 .example .result-eval{color:white;background:orange;}
-table.doc{float:right;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;width:50%;margin:1em 0;background:#FDF3C6;}
+table.doc{float:right;-moz-border-radius:3px;-webkit-border-radius:3px;border-radius:3px;width:50%;margin:1em 0;background:#FDF3C6;overflow:hidden;}
 table.doc th{text-align:right;}
 table.doc .tag td{font-weight:bold;font-family:monospace;}
 table.doc th,table.doc td{padding:5px 10px;}
 pre{font-family:monospace;}
-.toc{position:relative;top:0;-webkit-border-bottom-right-radius:6px;-webkit-border-bottom-left-radius:6px;-moz-border-radius-bottomright:6px;-moz-border-radius-bottomleft:6px;border-bottom-right-radius:6px;border-bottom-left-radius:6px;width:960px;min-height:90px;background:#222222;overflow:hidden;}
-.toc table{margin:0 0 0 0;width:960px;height:150px;background:#222222;}
-.toc td{padding:1.4em 0 1.4em 40%;width:957.2px;}
-.toc ul{margin:0;-moz-column-count:2;-moz-column-gap:1em;-webkit-column-count:2;-webkit-column-gap:1em;min-height:16.5em;}
+.toc{position:relative;top:0;width:960px;height:106px;background:#222222;overflow:hidden;}
+.toc ul{position:relative;margin:0;display:none;padding:1.4em 0 0 40%;-moz-column-count:2;-moz-column-gap:1em;-webkit-column-count:2;-webkit-column-gap:1em;height:260px;}
 .toc li{list-style:none;width:100%;margin-top:2px;margin-bottom:2px;font-weight:bold;}
-.toc>li{break-after:column;}
 .toc li.level2{padding-left:1.4em;font-weight:normal;}
 .toc li a{text-decoration:none;color:#ffffff;width:100%;display:inline-block;cursor:pointer;}
 .toc li a:hover{color:orange;}
-.toggle{position:relative;bottom:0;display:block;margin:106px 0 0 0;-webkit-border-bottom-right-radius:6px;-webkit-border-bottom-left-radius:6px;-moz-border-radius-bottomright:6px;-moz-border-radius-bottomleft:6px;border-bottom-right-radius:6px;border-bottom-left-radius:6px;width:912px;font-size:0.75em;text-align:right;letter-spacing:1px;padding:0 24px;height:16px;cursor:pointer;color:#ffffff;background:#222222;background:-moz-linear-gradient(top, #222222 0%, #555555 100%);background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #222222), color-stop(100%, #555555));filter:progid:DXImageTransform.Microsoft.Gradient( StartColorStr= #222222 , EndColorStr= #555555 ,GradientType=0 );-ms-filter:progid:DXImageTransform.Microsoft.Gradient( StartColorStr= #222222 , EndColorStr= #555555 ,GradientType=0 );}
+.toggle{display:block;margin:0;-webkit-border-bottom-right-radius:6px;-webkit-border-bottom-left-radius:6px;-moz-border-radius-bottomright:6px;-moz-border-radius-bottomleft:6px;border-bottom-right-radius:6px;border-bottom-left-radius:6px;width:912px;font-size:0.75em;text-align:right;letter-spacing:1px;padding:0 24px;height:16px;cursor:pointer;color:#ffffff;background:#222222;background:-moz-linear-gradient(top, #222222 0%, #555555 100%);background:-webkit-gradient(linear, left top, left bottom, color-stop(0%, #222222), color-stop(100%, #555555));filter:progid:DXImageTransform.Microsoft.Gradient( StartColorStr= #222222 , EndColorStr= #555555 ,GradientType=0 );-ms-filter:progid:DXImageTransform.Microsoft.Gradient( StartColorStr= #222222 , EndColorStr= #555555 ,GradientType=0 );}
 .toggle:visited{color:#ffffff;}
 .toggle:hover{color:#222222;background:orange;}

@@ -2,22 +2,20 @@
 #{set title:'JSTemplates docs' /}
 #{set 'moreScripts'}
 <script type="text/javascript">
-    var tocHidden = false;
     function toggleToc(){
-        var toc = jQuery(".toc table");
-        if(tocHidden) {
-            toc.slideUp('slow');
-        } else{
-            toc.slideDown('slow');
-        }
-        tocHidden = !tocHidden;
+        var hs = $(".toc").height();
+        hs = (hs<=106) ? hs=280 : hs=106;
+        $(".toc").animate({
+            height: hs
+            }, 'fast', function() {
+            $(".toc ul").toggle();
+        });
     }
     function pageMe(h){
-        var e = jQuery("#"+h);
+        var e = $("#"+h);
         var s = e.closest(".para");
-        jQuery(".para:visible").slideUp();
-        s.slideDown();
-        jQuery("h2,h3").removeClass("active");
+        if(s.is(":hidden")) {$(".para:visible").slideUp();s.slideDown()};
+        $(".active").removeClass("active");
         e.addClass('active');
     }
 </script>
@@ -28,11 +26,8 @@
 
 <script data-jstemplate="inline" type="text/html">
  <div class="toc">
-  <table style="display:none;">
-  <tr>
-    <td>
   <ul>
-   <li><a href="">Home</a></li>
+   <li><a href="/application/docs" >Home</a></li>
   ~{jQuery selector: ".para .title, h3", var: 'el'}
    !{ 
      var t = el.text();
@@ -42,16 +37,13 @@
    <li class="^{el.is('h3') ? 'level2': ''}"><a rel="#^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
   ~{/jQuery}
   </ul>
-   </td>
-  </tr>
-  </table>
-  <a class="toggle" onclick="toggleToc()">NAV</a>
 
  </div>
+  <a class="toggle" onclick="toggleToc()">NAV</a>
 </script>
 
 <h1>
- <div class="product-name"><span>JS</span>Templates*</div>
+ <a href="/application/docs" class="product-name"><span>JS</span>Templates*</a>
  <div class="tagline">*Client-side templates for an easy life</div>
 </h1>
 
