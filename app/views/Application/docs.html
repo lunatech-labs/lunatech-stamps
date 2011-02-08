@@ -2,22 +2,34 @@
 #{set title:'JSTemplates docs' /}
 #{set 'moreScripts'}
 <script type="text/javascript">
+    var hs = $(".toc").height();
     function toggleToc(){
-        var hs = $(".toc").height();
         hs = (hs<=106) ? hs=280 : hs=106;
         $(".toc").animate({
             height: hs
             }, 'fast', function() {
             $(".toc ul").toggle();
         });
+        $(".toggle").animate( { top: hs }, 'fast' );
+        $("#site").animate( { marginTop: hs+24 }, 'fast' );
+
     }
-    function pageMe(h){
+    function pageMe(o,h){
         var e = $("#"+h);
         var s = e.closest(".para");
-        if(s.is(":hidden")) {$(".para:visible").slideUp();s.slideDown()};
+        if(s.is(":hidden")) {
+            $(".para:visible").hide();
+            s.slideDown(function(){
+                $("body").eq(0).scrollTop((e.offset()).top - (hs + 24))
+            });
+        } else {
+            $("body").eq(0).scrollTop((e.offset()).top - (hs + 24))
+        };
         $(".active").removeClass("active");
         e.addClass('active');
+        o.addClass('active');
     }
+
 </script>
 #{/set}
 #{set 'moreStyles'}
@@ -27,14 +39,14 @@
 <script data-jstemplate="inline" type="text/html">
  <div class="toc">
   <ul>
-   <li><a href="/application/docs" >Home</a></li>
+   <li><a href="/application/docs">Home</a></li>
   ~{jQuery selector: ".para .title, h3", var: 'el'}
    !{ 
      var t = el.text();
-     var a = t.replace(/\s|\?/gi, "");
+     var a = t.replace(/\?/gi,"").replace(/\s/gi,"-").toLowerCase();
      el.attr('id', a);
    }!
-   <li class="^{el.is('h3') ? 'level2': ''}"><a rel="#^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
+   <li class="^{el.is('h3') ? 'level2': ''}"><a href="#!/^{a}" onclick="pageMe($(this),'^{a}')">^{t}</a></li>
   ~{/jQuery}
   </ul>
 

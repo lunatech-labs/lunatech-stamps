@@ -8,10 +8,10 @@
 
 
 
-        
+    #site { margin-top: 106px + 24px; } 
             
     h1 {
-        position: absolute;
+        position: fixed;
         top:0;
         z-index: 100;
         margin-top: @base-height/3;
@@ -34,7 +34,8 @@
         }
 
     .para { display: none; }
-    h1+.para {
+    
+    h1 +.para {
         display: block;
         }
 
@@ -70,7 +71,7 @@
     	background: white;
     	overflow:hidden;
     }
-    
+
     .example td {
     	width: 33%;
     	padding: 5px 10px;
@@ -118,8 +119,9 @@
     pre { font-family: monospace;}
     
     .toc {
-        position: relative;
+        position: fixed;
         top:0;
+        z-index: 20;
     	width: 960px;
     	height: 106px;
     	background: @dark-color;
@@ -157,11 +159,14 @@
     	cursor: pointer;
     }
     
+    .toc li a.active,
     .toc li a:hover {
         color: orange;
     }
     
     .toggle {
+        position: fixed;
+        top: 106px;
         display: block;
         margin: 0;
         .rounded-corners-bottom(@rad);
