@@ -5,8 +5,11 @@
 
     
     @import "lib.less";
-    
-    
+
+
+
+        
+            
     h1 {
         position: absolute;
         top:0;
@@ -28,9 +31,13 @@
         padding: 0 0 0 4.6em;
         font-size: 0.5em;
         }
+    .para { display: none; }
+    h1+.para {
+        display: block;
+        }
 
     h2 {
-        margin-top: 3em;
+        margin-top: 1em;
         font-size: 2em;
         font-family: @fonts-header;
         }
@@ -38,7 +45,7 @@
         margin-top: 1em;
         }
     
-    
+    .active { background: orange; }
     .example li {
     	color: black;
     	margin-top: 3px;
@@ -102,17 +109,19 @@
     pre { font-family: monospace;}
     
     .toc {
-/*         position: absolute; */
+        position: relative;
         top:0;
+        .rounded-corners-bottom(@rad);
     	width: 960px;
-    	min-height: 96px;
+    	min-height: 90px;
     	background: @dark-color;
         overflow: hidden;
         }
     
     .toc table {
-    	margin: 0.5em 0 0 0;
+    	margin: 0 0 0 0;
     	width: 960px;
+    	height: 150px;
     	background: @dark-color;
     }
     .toc td {
@@ -148,6 +157,7 @@
     	color: @light-color;
     	width: 100%;
     	display: inline-block;
+    	cursor: pointer;
     }
     
     .toc li a:hover {
@@ -155,13 +165,15 @@
     }
     
     .toggle {
+        position: relative;
+        bottom: 0;
         display: block;
+        margin: 106px 0 0 0;
         .rounded-corners-bottom(@rad);
     	width: 960px - @base-width;
     	font-size: 0.75em;
     	text-align: right;
     	letter-spacing: 1px;
-        margin-bottom: 4em;
     	padding: 0 @body-whitespace;
     	height: 16px;
     	cursor: pointer;
@@ -175,3 +187,7 @@
     	color: @dark-color;
     	background: orange;
     }
+    
+    
+    
+    
