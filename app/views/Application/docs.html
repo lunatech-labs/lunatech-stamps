@@ -1,6 +1,7 @@
 #{extends 'main.html' /}
 #{set title:'JSTemplates docs' /}
 #{set 'moreScripts'}
+<script src="@{'/public/scripts/less.js'}" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
     var hs = $(".toc").height();
     function toggleToc(){
@@ -40,7 +41,7 @@
 </script>
 #{/set}
 #{set 'moreStyles'}
- <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/styles/jstemplates/docs.css'}">
+ <link rel="stylesheet/less" type="text/css" media="screen" href="@{'/public/styles/jstemplates/less/docs.less'}">
 #{/set}
 
 <script data-jstemplate="inline" type="text/html">
@@ -452,7 +453,7 @@ Total: ^{count}~{/noEval}~{/example}
      Evaluates the body when the Future instance data is ready, possibly asynchronously if it is not ready yet.
     ~{/doc}
   </script>
-  <h1>future</h1>
+  <h3>future</h3>
   <p>
    The <tt>future</tt> tag allows you to delay template evaluation until the given <tt>Future</tt> is defined.
   </p>
@@ -599,9 +600,9 @@ Total: ^{count}~{/noEval}~{/example}
 </div>
 
 <div class="para">
- <div class="title">API</div>
+ <h2 class="title">API</h2>
  <div class="body">
-  <h1>Invoking functions when JSTemplates is ready</h1>
+  <h3>Invoking functions when JSTemplates is ready</h3>
   <p>
    Sometimes you need to invoke some code when all templates have been executed, and <tt>body.onload</tt> or
    <tt>jQuery(f)</tt> is not enough, but you can register your initialisation code with:
