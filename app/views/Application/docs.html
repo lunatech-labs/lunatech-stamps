@@ -29,7 +29,14 @@
         e.addClass('active');
         o.addClass('active');
     }
-
+    window.onload = init;
+    function init(){
+        var hId = location.hash.split("/")[1];
+        if (hId != undefined ) {
+            if (hs<=106) toggleToc();
+            pageMe($("a[href*="+hId+"]"),hId);
+        }
+    }
 </script>
 #{/set}
 #{set 'moreStyles'}
