@@ -446,6 +446,52 @@ Total: ^{count}~{/noEval}~{/example}
   </script>
 
   <script data-jstemplate="inline" type="text/html">
+    ~{doc tag: 'future', 
+          attribute: 'an Future instance holding a reference to data that will become available asynchronously', 
+          body: true}
+     Evaluates the body when the Future instance data is ready, possibly asynchronously if it is not ready yet.
+    ~{/doc}
+  </script>
+  <h1>future</h1>
+  <p>
+   The <tt>future</tt> tag allows you to delay template evaluation until the given <tt>Future</tt> is defined.
+  </p>
+  <p>
+   When doing AJAX it's likely you'll have some templates that will depend on external data which you
+   load using AJAX, which means it's going to be asynchronous.
+  </p>
+  <p>
+   In JSTemplates we use <i>futures</i> to describe values that might or might not yet be defined 
+   (because they could arrive later via AJAX). When you pass the <tt>future</tt> tag a value which is 
+   an instance of the type <tt>JSTemplates.Future</tt>, the current template tag evaluation is delayed 
+   until the <i>future</i> instance is defined fully (when it receives its value from the network, 
+   for instance), and the current template is <i>partially</i> evaluated, leaving gaps
+   (actually, placeholders) where the template tags are waiting for <i>futures</i>.
+  </p>
+  <p>
+   Once the <i>future</i> instances are complete, the template processing is resumed with the 
+   <i>future</i>'s value and the placeholders are replaced with the evaluation of the delayed templates.
+  </p>
+  <p>
+   This makes it very easy to define a complete page with <i>holes</i> for the parts which rely on external data,
+   without delaying the rendering of the rest of the templates.
+  </p>
+  <p>
+   You can define a <i>future</i> which gets JSON data from an external source like this:
+  </p>
+  <script data-jstemplate="inline" type="text/html">
+   ~{example}~{noEval}~{future 
+   value:new JSTemplates.Future("/Application/data"), 
+   var:'elements' }
+ <ul>
+ ~{list items: elements, var: 'v'}
+  <li>Value of v is: ^{v}</li>
+ ~{/list}
+ </ul>
+~{/future}~{/noEval}~{/example}
+  </script>
+
+  <script data-jstemplate="inline" type="text/html">
     ~{doc tag: 'noEval', 
           body: true}
      Outputs the body with no JSTemplate interpretation. Use this if you want to output code that would
