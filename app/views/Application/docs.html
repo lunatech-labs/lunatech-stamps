@@ -3,39 +3,40 @@
 #{set 'moreScripts'}
 <script src="@{'/public/scripts/less.js'}" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-    var hs = $(".toc").height();
-    function toggleToc(){
-        hs = (hs<=106) ? hs=280 : hs=106;
+    function hsf(){return $(".toc ul").height()+36}
+    var hs = hsf();
+    function adjustToc(o){
+        hs = hsf();
         $(".toc").animate({
             height: hs
             }, 'fast', function() {
-            $(".toc ul").toggle();
+             hs = hsf();
         });
-        $(".toggle").animate( { top: hs }, 'fast' );
         $("#site").animate( { marginTop: hs+24 }, 'fast' );
-
     }
-    function pageMe(o,h){
-        var e = $("#"+h);
-        var s = e.closest(".para");
-        if(s.is(":hidden")) {
-            $(".para:visible").hide();
-            s.slideDown(function(){
-                $("body").eq(0).scrollTop((e.offset()).top - (hs + 24))
-            });
-        } else {
-            $("body").eq(0).scrollTop((e.offset()).top - (hs + 24))
-        };
+    function pageMe(h){
+        var l = $("#link-"+h);
+        var h = $("#"+h);
+        var p = h.closest(".para");
+        if(p.is(":hidden")) {
+            $(".para:visible").slideUp();
+            p.slideDown(function(){ slideToc(l); });
+        } 
         $(".active").removeClass("active");
-        e.addClass('active');
-        o.addClass('active');
+        h.addClass('active');
+        l.addClass('active');
+        $("body").eq(0).scrollTop((h.offset()).top - (hs+24));
+    }
+    function slideToc(o){
+        $(".level2:visible").slideUp();
+        o.closest('.level1').nextUntil(".level1").slideDown(function(){adjustToc()});
+        o.closest('.level2').prevUntil(".level1").nextUntil(".level1").andSelf().slideDown(function(){adjustToc()});
     }
     window.onload = init;
     function init(){
-        var hId = location.hash.split("/")[1];
-        if (hId != undefined ) {
-            if (hs<=106) toggleToc();
-            pageMe($("a[href*="+hId+"]"),hId);
+        var h = location.hash.split("/")[1];
+        if (h != undefined ) {
+            $("#link-"+h).eq(0).trigger('click');
         }
     }
 </script>
@@ -47,19 +48,19 @@
 <script data-jstemplate="inline" type="text/html">
  <div class="toc">
   <ul>
-   <li><a href="/application/docs">Home</a></li>
+<!--    <li><a href="/application/docs">Home</a></li> -->
   ~{jQuery selector: ".para .title, h3", var: 'el'}
    !{ 
      var t = el.text();
      var a = t.replace(/\?/gi,"").replace(/\s/gi,"-").toLowerCase();
      el.attr('id', a);
    }!
-   <li class="^{el.is('h3') ? 'level2': ''}"><a href="#!/^{a}" onclick="pageMe($(this),'^{a}')">^{t}</a></li>
+   <li class="^{el.is('h3') ? 'level2': 'level1'}"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
   ~{/jQuery}
   </ul>
 
  </div>
-  <a class="toggle" onclick="toggleToc()">NAV</a>
+<!--   <a class="toggle" onclick="toggleToc()">NAV</a> -->
 </script>
 
 <h1>
