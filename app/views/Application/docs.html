@@ -398,7 +398,8 @@ Total: ^{count}~{/noEval}~{/example}
   </p>
   <script data-jstemplate="inline" type="text/html">
    ~{example}~{noEval}<ul>
- ~{list items: ["blue","green","red"], var: "color"}
+ ~{list items: ["blue","green","red"], 
+        var: "color"}
   <li>^{color_index}: ^{color}</li>
  ~{/list}
 </ul>~{/noEval}~{/example}
