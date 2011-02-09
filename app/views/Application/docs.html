@@ -5,7 +5,7 @@
 <script type="text/javascript">
     function hsf(){return $(".toc ul").height()+36}
     var hs = hsf();
-    function adjustToc(o){
+    function adjustToc(){
         hs = hsf();
         $(".toc").animate({
             height: hs
@@ -15,6 +15,7 @@
         $("#site").animate( { marginTop: hs+24 }, 'fast' );
     }
     function pageMe(h){
+        $(".toc, h1").css("position","fixed");
         var l = $("#link-"+h);
         var h = $("#"+h);
         var p = h.closest(".para");
@@ -35,9 +36,9 @@
     window.onload = init;
     function init(){
         var h = location.hash.split("/")[1];
-        if (h != undefined ) {
-            $("#link-"+h).eq(0).trigger('click');
-        }
+        $("#link-"+h).eq(0).trigger('click');
+        adjustToc();
+        $(".toc, h1").css("position","fixed");
     }
 </script>
 #{/set}
@@ -48,7 +49,6 @@
 <script data-jstemplate="inline" type="text/html">
  <div class="toc">
   <ul>
-<!--    <li><a href="/application/docs">Home</a></li> -->
   ~{jQuery selector: ".para .title, h3", var: 'el'}
    !{ 
      var t = el.text();
@@ -60,7 +60,6 @@
   </ul>
 
  </div>
-<!--   <a class="toggle" onclick="toggleToc()">NAV</a> -->
 </script>
 
 <h1>
@@ -69,7 +68,7 @@
 </h1>
 
 <div class="para">
- <h3>What is JSTemplates</h3>
+ <h2 class="title">What is JSTemplates?</h2>
  <div class="body">
   <p>
   JSTemplates is a client-side templating library similar to Play! Framework's server-side Groovy templates,

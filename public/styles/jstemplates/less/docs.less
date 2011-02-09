@@ -8,10 +8,10 @@
 
 
 
-    #site { margin-top: 106px + 24px; } 
+    #site { overflow: visible; } 
              
     h1 {
-        position: fixed;
+        position: absolute;
         top:0;
         z-index: 100;
         margin-top: @base-height/3;
@@ -119,12 +119,13 @@
     }
     
     .toc {
-        position: fixed;
+        position: relative;
         top:0;
         z-index: 20;
+        margin-bottom: 2em;
         .rounded-corners-bottom(@rad);
+        padding-bottom: 1em;
         width: 960px;
-        height: 124px;
         background: fadeout(@dark-color,5%);
         overflow: hidden;
         }
@@ -145,6 +146,7 @@
         }
     
     .toc li.level2 {
+        display: none;
     	padding-left: @base-height;
     	font-weight: normal;
     }
