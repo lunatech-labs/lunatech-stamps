@@ -598,3 +598,14 @@ Total: ^{count}~{/noEval}~{/example}
  </div>
 </div>
 
+<div class="para">
+ <div class="title">API</div>
+ <div class="body">
+  <h1>Invoking functions when JSTemplates is ready</h1>
+  <p>
+   Sometimes you need to invoke some code when all templates have been executed, and <tt>body.onload</tt> or
+   <tt>jQuery(f)</tt> is not enough, but you can register your initialisation code with:
+  </p>
+  <code><pre>JSTemplates.ready(function(){ alert('It is ready!'); });</pre></code>
+ </div>
+</div>
