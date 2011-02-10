@@ -3,43 +3,54 @@
 #{set 'moreScripts'}
 <script src="@{'/public/scripts/less.js'}" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
-    function hsf(){return $(".toc ul").height()+36}
-    var hs = hsf();
+
+    function hsf(){return $(".toc ul").height()+24}
+    
     function adjustToc(){
-        hs = hsf();
+        var hs = hsf();
         $(".toc").animate({
             height: hs
-            }, 'fast', function() {
-             hs = hsf();
-        });
+            }, 'fast');
         $("#site").animate( { marginTop: hs+24 }, 'fast' );
     }
     function pageMe(h){
-        $(".toc, h1").css("position","fixed");
         var l = $("#link-"+h);
         var h = $("#"+h);
         var p = h.closest(".para");
         if(p.is(":hidden")) {
-            $(".para:visible").slideUp();
-            p.slideDown(function(){ slideToc(l); });
+            $(".para").hide();
+            p.show();
         } 
         $(".active").removeClass("active");
         h.addClass('active');
         l.addClass('active');
-        $("body").eq(0).scrollTop((h.offset()).top - (hs+24));
+        $("body").eq(0).scrollTop((h.offset()).top - (hsf()+24));
+        slideToc(l);
     }
-    function slideToc(o){
-        $(".level2:visible").slideUp();
-        o.closest('.level1').nextUntil(".level1").slideDown(function(){adjustToc()});
-        o.closest('.level2').prevUntil(".level1").nextUntil(".level1").andSelf().slideDown(function(){adjustToc()});
+    
+    function slideToc(l){
+        var li = l.closest('li');
+        if(li.is(".level2")){
+            li.nextUntil(".level1").andSelf().slideDown();
+            li.prevUntil(".level1").andSelf().slideDown(function(){adjustToc()});
+        } else {
+            $(".level2:visible").slideUp();
+            li.nextUntil(".level1").slideDown(function(){adjustToc()});
+        }
     }
+    
     window.onload = init;
     function init(){
-        var h = location.hash.split("/")[1];
-        $("#link-"+h).eq(0).trigger('click');
-        adjustToc();
         $(".toc, h1").css("position","fixed");
+        var h = location.hash.split("/")[1];
+        if (h==undefined) {
+            $(".toc li:first a").trigger('click');
+        } else {
+            $("#link-"+h).eq(0).trigger('click');
+        }
+        adjustToc();
     }
+    
 </script>
 #{/set}
 #{set 'moreStyles'}
