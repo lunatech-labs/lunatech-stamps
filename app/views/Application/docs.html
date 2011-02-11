@@ -24,7 +24,7 @@
         $(".active").removeClass("active");
         h.addClass('active');
         l.addClass('active');
-        $("body").eq(0).scrollTop((h.offset()).top - (hsf()+24));
+        $('html:not(:animated),body:not(:animated)').scrollTop((h.offset()).top - (hsf()+24));
         slideToc(l);
     }
     
