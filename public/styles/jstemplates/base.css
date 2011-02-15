@@ -1,134 +1,23 @@
-/*  ###########################################################################
-    company:    DutchCelt Design
-    date:       January 2011
-    ########################################################################### */
-
-    
-/*  RESET [based on Eric Meyer's CSS Reset v2]------------------------------------ */
-
-    html, body, div, span, applet, object, iframe,
-    h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-    a, abbr, acronym, address, big, cite, code,
-    del, dfn, em, img, ins, kbd, q, s, samp,
-    small, strike, strong, sub, sup, tt, var,
-    b, u, i, center,
-    dl, dt, dd, ol, ul, li,
-    fieldset, form, label, legend,
-    table, caption, tbody, tfoot, thead, tr, th, td,
-    article, aside, canvas, details, embed, 
-    figure, figcaption, footer, header, hgroup, 
-    menu, nav, output, ruby, section, summary,
-    time, mark, audio, video {
-    	margin: 0;
-    	padding: 0;
-    	border: 0;
-    	font-size: 100%;
-    	font: inherit;
-    	vertical-align: baseline;
-        }
-        
-/*  HTML5 display-role reset for older browsers ------------------------------- */
-
-    article, aside, details, figcaption, figure, 
-    footer, header, hgroup, menu, nav, section {
-    	display: block;
-        }
-
-
-/*  Basics -------------------------------------------------------------------- */
-
-    body {
-        font: normal normal 82.5%/1.5 Arial, Helvetica, sans-serif; 
-        }
-
-    h1, h2, h3, h4, h5, h6, 
-    blockquote, pre, address, cite, code, q, samp {
-        padding: 0 0 0.5em 0;
-        }
-    
-    li ul, li ol {
-        margin:0  0 1.5em 1.5em;
-        }
-        
-    ul, ol {
-        margin:0 1.5em 1.5em 1.5em;
-        }
-    
-    p {
-        padding: 0 0 1em 0;
-        }
-
-    blockquote {
-        text-align: right;
-        font-style: italic;
-        }
-    blockquote:before, blockquote:after,
-    q:before, q:after {
-        content: "";
-        }
-    blockquote, q {
-        quotes: "" "";
-        }
-    
-        
-/*  headings ------------------------------------------------------------------ */
-
-    h1 {
-        font: normal normal 2em/1 Arial, Helvetica, sans-serif;
-        }
-    h2 {
-        font: normal normal 1.6em/1 Arial, Helvetica, sans-serif;
-        }
-    h3 {
-        font: normal normal 1.4em/1 Arial, Helvetica, sans-serif;
-        }
-    h4 {
-        font: normal normal 1em/1.25 Arial, Helvetica, sans-serif;
-        }
-    h5 {
-        font: normal normal 0.9/1 Arial, Helvetica, sans-serif;
-        }
-    h6 {
-        font: normal normal 0.5em/1 Arial, Helvetica, sans-serif;
-        }
-    
-    
-/*  tables still need 'cellspacing="0"' in the markup ------------------------- */
-
-    table {
-        border-collapse: separate;
-        border-spacing: 0;
-        }
-        
-    caption, th, td {
-        text-align: left;
-        vertical-align: top;
-        line-height: 1.2;
-        }
-
-
-/*  links --------------------------------------------------------------------- */
-
-    a { 
-        text-decoration: none; 
-        color: #0080ff;
-        background-repeat: no-repeat;
-        }
-    a:visited  {
-        color: #0080ff;
-        }
-    a:visited  {
-        color: #8000ff;
-        }
-    a:hover  { 
-        text-decoration:none; 
-        }
-    a:active  { 
-        text-decoration:none; 
-        }
-    a:focus {
-        outline: 1;
-        }
-
-
-
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline;}
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block;}
+body{font-style:normal;font-weight:normal;font-size:82.5%;line-height:1.6;font-family:Arial,sans-serif;}
+li ul,li ol{margin:0 0 0 1.4000000000000001em;}
+ul,ol{margin:0 1.4000000000000001em 1em 1.4000000000000001em;}
+p{padding:0 0 1em 0;}
+hgroup{padding:0 0 1.4000000000000001em 0;line-height:1;}
+blockquote{text-align:right;font-style:italic;}
+blockquote:before,blockquote:after,q:before,q:after{content:"";}
+blockquote,q{quotes:"" "";}
+h1{font-size:2.5200000000000005em;}
+h2{font-size:2.24em;}
+h3{font-size:1.8200000000000003em;}
+h4{font-size:1.5400000000000003em;}
+h5{font-size:1.2600000000000002em;}
+h6{font-size:1em;}
+table{border-collapse:separate;border-spacing:0;}
+caption,th,td{text-align:left;vertical-align:top;line-height:1.2;}
+a{text-decoration:none;color:#0080ff;background-repeat:no-repeat;}
+a:visited{color:#8000ff;}
+a:hover{text-decoration:none;color:#0080ff;}
+a:active{text-decoration:none;color:#0080ff;}
+a:focus{outline:1;}

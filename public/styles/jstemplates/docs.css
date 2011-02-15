@@ -1,8 +1,8 @@
 #site{overflow:visible;}
-h1{position:absolute;top:0;z-index:100;margin-top:0.4666666666666666em;width:auto;padding:0 24px;color:#ffffff;}
-h1 .product-name{font-size:1.9em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;color:#ffffff;}
+h1{position:absolute;top:12px;z-index:100;margin-top:0;line-height:1;width:auto;padding:0 24px;color:#ffffff;}
+h1 .product-name{font-size:1.3em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;color:#ffffff;}
 h1 .product-name span{color:orange;}
-h1 .tagline{padding:0 0 0 4.6em;font-size:0.5em;}
+h1 .tagline{padding:0 0 0 48px;font-size:0.4em;}
 .para{display:none;}
 h1+.para{display:block;}
 h2{font-size:2em;font-family:"Virgo01Regular",Arial,Helvetica,sans-serif;}
@@ -21,10 +21,10 @@ table.doc th{text-align:right;}
 table.doc .tag td{font-weight:bold;font-family:monospace;}
 table.doc th,table.doc td{padding:5px 10px;}
 pre{font-family:monospace;white-space:pre-wrap;}
-.toc{position:relative;top:0;z-index:20;margin-bottom:2em;-webkit-border-bottom-right-radius:6px;-webkit-border-bottom-left-radius:6px;-moz-border-radius-bottomright:6px;-moz-border-radius-bottomleft:6px;border-bottom-right-radius:6px;border-bottom-left-radius:6px;padding-bottom:1em;width:960px;background:rgba(34, 34, 34, 0.95);overflow:hidden;}
-.toc ul{position:relative;margin:0;padding:1.4em 0 0 72%;width:250px;}
+.toc{position:relative;top:0;z-index:20;margin-bottom:2em;-webkit-border-bottom-right-radius:4px;-webkit-border-bottom-left-radius:4px;-moz-border-radius-bottomright:4px;-moz-border-radius-bottomleft:4px;border-bottom-right-radius:4px;border-bottom-left-radius:4px;padding-bottom:1em;width:960px;background:rgba(34, 34, 34, 0.95);overflow:hidden;}
+.toc ul{position:relative;margin:0;padding:1.4000000000000001em 0 0 72%;width:250px;}
 .toc li{list-style:none;width:100%;margin-top:2px;margin-bottom:2px;font-weight:bold;}
-.toc li.level2{display:none;padding-left:1.4em;font-weight:normal;}
+.toc li.level2{display:none;padding-left:1.4000000000000001em;font-weight:normal;}
 .toc li a{text-decoration:none;color:#ffffff;width:100%;display:inline-block;cursor:pointer;}
 .toc li a.active,.toc li a:hover{color:orange;}
 tt{display:inline-block;font-family:monospace;background:#FDF3C6;}
