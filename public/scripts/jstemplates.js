@@ -140,7 +140,7 @@ Tag.prototype.recursiveOutput = function(out, env){
 		var child = this.children[i];
 		if(typeof child == 'string'){
 			out(child);
-			if(child.trim().length > 0)
+			if(jQuery.trim(child).length > 0)
 				lastChild = child;
 		}else{
 			child.output(out, lastChild, env);
@@ -507,6 +507,7 @@ function autoProcess2(){
 	log("jstemplates autoprocess 2");
 	// we fist want to load all user tags
 	// data-jstemplate="tag" support
+	log("loading tag templates");
 	jQuery("[data-jstemplate=tag]").each(function(index, elem){
 		var $elem = jQuery(elem);
 		var name = $elem.attr('name');
@@ -557,6 +558,7 @@ function autoProcess2(){
 
 	// then define new templates by reference
 	// data-jstemplate="ref" support
+	log("loading ref templates");
 	jQuery("[data-jstemplate=ref]").each(function(index, elem){
 		var $elem = jQuery(elem);
 		var id = $elem.attr('id');
@@ -567,6 +569,7 @@ function autoProcess2(){
 		templates[id] = parseTemplates(data);
 	});
 	
+	log("resolving templates");
 	// now we have every template defined, let's resolve them
 	for(var template in templates){
 		templates[template].resolve();
@@ -575,6 +578,7 @@ function autoProcess2(){
 	// and then process the templates
 	
 	// data-template="url" support
+	log("loading url templates");
 	jQuery("[data-jstemplate-url]").each(function(index, elem){
 		var $elem = jQuery(elem);
 		var url = $elem.attr('data-jstemplate-url');
@@ -582,6 +586,7 @@ function autoProcess2(){
 	});
 
 	// data-jstemplate="inline" support
+	log("loading inline templates");
 	jQuery("[data-jstemplate=inline]").each(function(index, elem){
 		var $elem = jQuery(elem);
 		var data = $elem.html();
@@ -590,8 +595,9 @@ function autoProcess2(){
 	});
 	
 	// then trigger the ready signal
+	log("running onready triggers");
 	ready = true;
-	onready.forEach(function (f){
+	jQuery.each(onready, function (i, f){
 		f();
 	});
 }
@@ -611,16 +617,22 @@ function loadTemplateFromURL(target, url, env){
 }
 
 function processTemplates(text, env){
+	try{
+		
 	var tag = parseTemplates(text);
 	// resolve them
 	tag.resolve();
 	// now output
 	return evalTemplate(tag, new Environment(env));
+	}catch(e){
+		log("Error: "+e);
+	}
 }
 
 JSTemplates.__processTemplates = processTemplates;
 
 function parseTemplates(text){
+	log("parseTemplates1 for "+text.length+" characters");
 	// start with a tag
 	var currentTag = new Tag('main');
 
@@ -632,10 +644,11 @@ function parseTemplates(text){
 	var openStack = [];
 	var noEval = false;
 	var lastText = 0;
+	log("parseTemplates for "+text.length+" characters");
 	for(var i=0;i<text.length;i++){
-		var c = text[i];
+		var c = text.charAt(i);
 		var hasMore = i<text.length-1;
-		var c2 = hasMore ? text[i+1] : undefined;
+		var c2 = hasMore ? text.charAt(i+1) : undefined;
 		if(!noEval && (openExpr|| openTag || openRef)){
 			if(c == '('){
 				openStack.push(')');
@@ -754,6 +767,7 @@ function parseTemplates(text){
 	// sanity check
 	if(currentTag.name != 'main')
 		throw "Bad current tag after parsing";
+	log("parseTemplates done");
 	return currentTag;
 }
 
@@ -767,7 +781,8 @@ function evalTemplate(tag, env, $target, replace){
 }
 
 function parseTag(tag){
-	if(tag[0] == '/'){
+	log('parse tag: '+tag);
+	if(tag.charAt(0) == '/'){
 		var name = tag.match(/^\/([-a-zA-Z0-9_]+)\s*$/)[1];
 		log('tag close for '+name);
 		var ret = makeTagOrRef(name);
@@ -776,7 +791,7 @@ function parseTag(tag){
 	}
 	var name = tag.match(/^([-a-zA-Z0-9_]+)[ \/]?/)[1];
 	log('tag name: '+name);
-	tag = tag.substring(name.length).trim();
+	tag = jQuery.trim(tag.substring(name.length));
 	var isOpen = !tag.match(/\/$/);
 	if(!isOpen)
 		tag = tag.substring(0, tag.length-1);
@@ -786,16 +801,17 @@ function parseTag(tag){
 	var attribute = undefined;
 	var valueStart = undefined;
 	var start = 0;
+	log('parse tag 1');
 	for(var i = 0;i<tag.length;i++){
-		var c = tag[i];
+		var c = tag.charAt(i);
 		if(openStack.length == 0 && c == ':'){
-			attribute = tag.substring(start, i).trim();
+			attribute = jQuery.trim(tag.substring(start, i));
 			valueStart = i+1;
 		}else if(openStack.length == 0 && c == ','){
 			if(!valueStart)
 				throw "Invalid syntax: attribute name missing: "+tag;
 			// we are done!
-			attributes[attribute] = tag.substring(valueStart, i).trim();
+			attributes[attribute] = jQuery.trim(tag.substring(valueStart, i));
 			hasAttribute = true;
 			valueStart = undefined;
 			start = i+1;
@@ -824,12 +840,13 @@ function parseTag(tag){
 			// all is well
 		}
 	}
+	log('parse tag 2');
 	if(valueStart){
 		// safety check
 		if(openStack.length != 0)
 			throw "Mismatched parent: forgot to close "+openStack.length+" parents";
 		// we still have some value left?
-		var value = tag.substring(valueStart).trim();
+		var value = jQuery.trim(tag.substring(valueStart));
 		attributes[attribute] = value;
 	}else if(tag.length > 0 && !hasAttribute){
 		// safety check
@@ -841,6 +858,7 @@ function parseTag(tag){
 	//log(attributes);
 	var ret = makeTagOrRef(name, attributes);
 	ret.isOpen = isOpen;
+	log('parse tag DONE: '+tag);
 	return ret;
 }
 

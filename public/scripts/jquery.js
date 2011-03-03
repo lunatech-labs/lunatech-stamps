@@ -863,8 +863,8 @@ jQuery.extend({
 							while( callbacks[ 0 ] ) {
 								callbacks.shift().apply( context, args );
 							}
-						}
-						finally {
+						} catch(pseudoError) {
+						} finally {
 							fired = [ context, args ];
 							firing = 0;
 						}
