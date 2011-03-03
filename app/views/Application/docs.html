@@ -1,6 +1,7 @@
 #{extends 'main.html' /}
 #{set title:'JSTemplates docs' /}
 #{set 'moreScripts'}
+<script src="@{'/public/scripts/less.js'}" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
 
     function hsf(){return $(".toc ul").height()+24}
@@ -53,7 +54,7 @@
 </script>
 #{/set}
 #{set 'moreStyles'}
- <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/styles/jstemplates/docs.css'}">
+ <link rel="stylesheet/less" type="text/css" media="screen" href="@{'/public/styles/jstemplates/less/docs.less'}">
 #{/set}
 
 <script data-jstemplate="inline" type="text/html">
