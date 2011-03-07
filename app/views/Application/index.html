@@ -1,8 +1,8 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
 #{set 'moreScripts'}
- <link rel="jstemplates" href="@{'/public/templates/remote-tags.html'}" type="text/html" />
- <link rel="jstemplates" href="@{'/public/templates/remote-tags2.html'}" type="text/html" />
+ <link rel="stamps" href="@{'/public/templates/remote-tags.html'}" type="text/html" />
+ <link rel="stamps" href="@{'/public/templates/remote-tags2.html'}" type="text/html" />
 #{/set}
 #{set 'moreStyles'}
 <style>
@@ -20,38 +20,38 @@ div {
  !{ JS statements }!
  ^{ JS expressions inserted in the body }
  `{ JS expression that is saved during template expansion, to be used in later JS code }
- Use a JSTemplates.Future instance to delay evaluation (right now only supported in the list tag)
+ Use a Stamps.Future instance to delay evaluation (right now only supported in the list tag)
 -->
 
 <!-- Procedural -->
 Procedural template expansion:
 <div id="output"></div>
 <script>
-	JSTemplates.loadTemplate("output", {url: "@{'/public/templates/t1.html'}"});
+	Stamps.loadTemplate("output", {url: "@{'/public/templates/t1.html'}"});
 </script>
 
 <!-- jQuery plugin -->
 jQuery template expansion:
 <div id="output2"></div>
 <script>
-	jQuery("#output2").jsTemplates({url: "@{'/public/templates/t1.html'}"});
+	jQuery("#output2").Stamps({url: "@{'/public/templates/t1.html'}"});
 </script>
 
 <!-- Declarative -->
 Automatic template expansion:
-<div data-jstemplate-url="@{'/public/templates/t1.html'}"></div>
+<div data-stamp-url="@{'/public/templates/t1.html'}"></div>
 
 <!-- Inline -->
 Automatic inline template expansion:
 <div>
-<script data-jstemplate="inline" type="text/html">
+<script data-stamp="inline" type="text/html">
   <ul>
   ~{list items:[1,2,3], var:'i' }
    <li>inline item: ^{i}</li>
   ~{/list}
   </ul>
   <ul>
-  ~{list items:new JSTemplates.Future("/data"), var:'d' }
+  ~{list items:new Stamps.Future("/data"), var:'d' }
    <li>Future data: ^{d}</li>
   ~{/list}
   </ul>
@@ -62,10 +62,10 @@ Automatic inline template expansion:
 <script type="text/javascript">
 //define our new tag type
 function HelloTag(name, attributes){
-	JSTemplates.Tag.apply(this, [name, attributes]);
+	Stamps.Tag.apply(this, [name, attributes]);
 }
-// make sure it inherits methods from JSTemplates.Tag
-JSTemplates.extend(HelloTag, JSTemplates.Tag);
+// make sure it inherits methods from Stamps.Tag
+Stamps.extend(HelloTag, Stamps.Tag);
 
 // and implement its behaviour
 HelloTag.prototype.outputInNewEnv = function(out, previousSibling, env){
@@ -76,25 +76,25 @@ HelloTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 	out('Hello ' + string);
 };
 
-// register this new tag in JSTemplates
-JSTemplates.declareTag('hello', HelloTag);
+// register this new tag in Stamps
+Stamps.declareTag('hello', HelloTag);
 </script>
 
 <!-- Simple Extensions -->
-<script name="hello2" data-jstemplate="tag" type="text/html">
+<script name="hello2" data-stamp="tag" type="text/html">
  Hello ^{_arg}
 </script>
 
-<script name="hello3" data-jstemplate="tag" type="text/html">
+<script name="hello3" data-stamp="tag" type="text/html">
  Hello ^{_firstName} ^{_lastName}
 </script>
 
-<script name="hello4" data-jstemplate="tag" type="text/html">
+<script name="hello4" data-stamp="tag" type="text/html">
  Hello ^{_firstName} ~{doBody/} ^{_lastName}
 </script>
 
 <!-- Inline -->
-<script data-jstemplate="inline" type="text/html">
+<script data-stamp="inline" type="text/html">
  Custom JS tag:
  <div>~{hello 'World!' /}</div>
  Simple tag with default argument:
@@ -106,20 +106,20 @@ JSTemplates.declareTag('hello', HelloTag);
 </script>
 
 <!-- Simple Reference -->
-<script id="ref1" data-jstemplate="ref" type="text/html">
+<script id="ref1" data-stamp="ref" type="text/html">
  ~{hello subject /}
 </script>
 
 Template reference with initial environment:
 <div id="ref1-target"></div>
 <script type="text/javascript">
- JSTemplates.ready(function(){
-	jQuery("#ref1-target").jsTemplates({id: "ref1"}, {subject: 'universe!'});
+ Stamps.ready(function(){
+	jQuery("#ref1-target").Stamps({id: "ref1"}, {subject: 'universe!'});
  });
 </script>
 
 <!-- Complex Reference -->
-<script id="ref2" data-jstemplate="ref" type="text/html">
+<script id="ref2" data-stamp="ref" type="text/html">
  <i>^{user.firstName}</i> <b>^{user.lastName}</b>
  <a href="#" onclick="return `{user}.clicky()">Click me (please)</a>
 </script>
@@ -127,18 +127,18 @@ Template reference with initial environment:
 Template reference with initial environment and dynamic value:
 <div id="ref2-target"></div>
 <script type="text/javascript">
- JSTemplates.ready(function(){
+ Stamps.ready(function(){
 	var user = {firstName: "Stef", lastName: "Epardaud"};
 	user.clicky = function(){
 		alert("I was clicked: "+user.firstName);
 		return false;
 	}
-	jQuery("#ref2-target").jsTemplates({id: "ref2"}, {user: user});
+	jQuery("#ref2-target").Stamps({id: "ref2"}, {user: user});
  });
 </script>
 
 <!-- Tag loaded automatically -->
-<script data-jstemplate="inline" type="text/html">
+<script data-stamp="inline" type="text/html">
  Tag loaded automatically
  <div>~{auto-tag 'Hi!' /}</div>
  Second tag loaded automatically in the same file

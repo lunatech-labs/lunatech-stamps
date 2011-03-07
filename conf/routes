@@ -3,11 +3,20 @@
 # ~~~~
 
 # Home page
+
+#{if play.Play.mode == play.Play.Mode.DEV}
 GET     /                                       Application.index
+#{/if}
+#{else}
+GET     /                                       Application.docs
+#{/else}
+
 GET		/data									Application.data
 
 # Map static resources from the /app/public folder to the /public path
 GET     /public/                                staticDir:public
 
 # Catch all
+#{if play.Play.mode == play.Play.Mode.DEV}
 *       /{controller}/{action}                  {controller}.{action}
+#{/if}

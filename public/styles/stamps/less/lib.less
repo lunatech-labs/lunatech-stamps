@@ -90,10 +90,10 @@
     .text-shadow(@loc, @color) {
         text-shadow: 0 @loc @line @color;
         }
-    .box-shadow(@color) {
-        -moz-box-shadow: 0 @line 0 @color;
-        -webkit-box-shadow: 0 @line 0 @color;
-        box-shadow: 0 @line 0 @color;
+    .box-shadow(@radius, @color) {
+        -moz-box-shadow: 0 @line @radius @color;
+        -webkit-box-shadow: 0 @line @radius @color;
+        box-shadow: 0 @line @radius @color;
         }
     .gradient(@start,@stop){
         background: @start; /* old browsers */

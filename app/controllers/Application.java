@@ -96,4 +96,19 @@ public class Application extends Controller {
     	status.save();
     	renderJSON(new StatusJSON(status), new DateSerializer());
     }
+
+    public static void on(){
+    	Logger.info("on called");
+    	renderText("on");
+    }
+    
+    public static void off(){
+    	Logger.info("off called");
+    	renderText("off");
+    }
+
+    public static void state(){
+    	Logger.info("state called");
+    	renderText("off");
+    }
 }

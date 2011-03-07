@@ -141,8 +141,6 @@
     .toc li {
     	list-style: none;
     	width: 100%;
-    	margin-top: 2px;
-    	margin-bottom: 2px;
     	font-weight: bold;
         }
     
@@ -150,6 +148,7 @@
         display: none;
     	padding-left: @base-height;
     	font-weight: normal;
+    	line-height: 130%;
     }
     
     .toc li a {
@@ -174,6 +173,62 @@
     	font-style: italic;
     }
     
-    
+    button {
+		display: inline-block;
+		outline: none;
+		cursor: pointer;
+		text-align: center;
+		text-decoration: none;
+		font: 14px/100% Arial, Helvetica, sans-serif;
+		font-weight: bold;
+		margin-top: 30px;
+		padding: .5em 2em .55em;
+		text-shadow: 0 1px 1px rgba(0,0,0,.3);
+		.rounded-corners(.5em);
+		.box-shadow(2px, rgba(0,0,0,.2));
+	}
+	
+	button:hover {
+		text-decoration: none;
+	}
 
-    
+	button:active {
+		position: relative;
+		top: 1px;
+	}
+    
+@orange: #FFA500;
+.orange {
+ 	color: lighten(@orange, 50%);
+	border: solid 1px @orange;
+	background: darken(@orange, 10%);
+	.gradient(darken(@orange, 5%), lighten(@orange, 5%));
+}
+.orange:hover {
+	background: darken(@orange, 10%);
+	.gradient(darken(@orange, 10%), @orange);
+}
+.orange:active {
+ 	color: lighten(@orange, 30%);
+	.gradient(lighten(@orange, 5%), darken(@orange, 5%));
+}
+
+@green: #24DC06;
+.green {
+ 	color: lighten(@green, 50%);
+	border: solid 1px @green;
+	background: darken(@green, 10%);
+	.gradient(darken(@green, 5%), lighten(@green, 5%));
+}
+.green:hover {
+	background: darken(@green, 10%);
+	.gradient(darken(@green, 10%), @green);
+}
+.green:active {
+ 	color: lighten(@green, 30%);
+	.gradient(lighten(@green, 5%), darken(@green, 5%));
+}
+
+button .info {
+	font-size: smaller;
+}

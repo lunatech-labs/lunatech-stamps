@@ -1,5 +1,5 @@
 #{extends 'main.html' /}
-#{set title:'JSTemplates docs' /}
+#{set title:'Stamps.js' /}
 #{set 'moreScripts'}
 <script src="@{'/public/scripts/less.js'}" type="text/javascript" charset="utf-8"></script>
 <script type="text/javascript">
@@ -54,10 +54,10 @@
 </script>
 #{/set}
 #{set 'moreStyles'}
- <link rel="stylesheet/less" type="text/css" media="screen" href="@{'/public/styles/jstemplates/less/docs.less'}">
+ <link rel="stylesheet/less" type="text/css" media="screen" href="@{'/public/styles/stamps/less/docs.less'}">
 #{/set}
 
-<script data-jstemplate="inline" type="text/html">
+<script data-stamp="inline" type="text/html">
  <div class="toc">
   <ul>
   ~{jQuery selector: ".para .title, h3", var: 'el'}
@@ -74,15 +74,27 @@
 </script>
 
 <h1>
- <a href="/application/docs" class="product-name"><span>JS</span>Templates*</a>
+ <a href="@{Application.docs}" class="product-name">Stamps<span>.js</span>*</a>
  <div class="tagline">*Client-side templates for an easy life</div>
+ <a href="@{'/public/scripts/stamps.js'}">
+  <button class="orange">
+ 	Download<br/>
+ 	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.js').size().formatSize()}</span>
+  </button>
+ </a>
+ <a href="@{'/public/scripts/stamps.min.js'}">
+  <button class="green">
+ 	Download (min)<br/>
+ 	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.min.js').size().formatSize()}</span>
+  </button>
+ </a>
 </h1>
 
 <div class="para">
- <h2 class="title">What is JSTemplates?</h2>
+ <h2 class="title">What is Stamps?</h2>
  <div class="body">
   <p>
-  JSTemplates is a client-side templating library similar to Play! Framework's server-side Groovy templates,
+  Stamps is a client-side templating library similar to Play! Framework's server-side Groovy templates,
   but on the client, in pure JavaScript.
   </p>
   
@@ -150,10 +162,10 @@
  var example = 1;
 </script>
 
-<script name="example" data-jstemplate="tag" type="text/html">
+<script name="example" data-stamp="tag" type="text/html">
   <table class="example">
    <tr>
-    <th class="program">JSTemplates</th>
+    <th class="program">Stamps</th>
     <th class="result">Result source</th>
     <th>Result</th>
    </tr>
@@ -166,7 +178,7 @@
     <script type="text/javascript">
      var template = jQuery("#ex^{example}").html();
      console.log("got template" + template);
-     var result = JSTemplates.__processTemplates(template);
+     var result = Stamps.__processTemplates(template);
      result = result.replace(/\n( *\n)+/g, "\n");
      jQuery("#ex^{example}-res").text(result);
      jQuery("#ex^{example}-res-eval").html(result);
@@ -185,20 +197,20 @@
  <div class="body">
   <h3>Expressions</h3>
   <p>
-  Here is our first example of using JSTemplates where we use the <tt>^{ expr }</tt> notation to inject the result
+  Here is our first example of using Stamps where we use the <tt>^{ expr }</tt> notation to inject the result
   of a JavaScript expression in the template result:
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}Here is the current date: 
 ^{new Date().toLocaleString()}~{/noEval}~{/example}
   </script>
 
   <h3>Tags</h3>
   <p>
-   Tags in JSTemplates are invoked with the <tt>~{ tag attr: val, attr: val... }</tt> notation and closed with
+   Tags in Stamps are invoked with the <tt>~{ tag attr: val, attr: val... }</tt> notation and closed with
    <tt>~{/ tag }</tt> and can be used for complex behaviour such as iterating lists:
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}<ul>
  ~{list items: [1,2,3,4,5], var: 'i'}
   <li>Item ^{i}</li>
@@ -211,10 +223,10 @@
 
   <h3>Code blocks</h3>
   <p>
-   Code blocks are very powerful in JSTemplates since they allow you to execute JavaScript statements during
+   Code blocks are very powerful in Stamps since they allow you to execute JavaScript statements during
    template evaluation. They are defined with <tt>!{ statement... }!</tt> notation:
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}!{ var count = 0; }!
 <ul>
  ~{list items: [1,2,3,4,5], var: 'i'}
@@ -232,7 +244,7 @@ Total: ^{count}~{/noEval}~{/example}
    time, and want to be able to call this function as an <i>onclick</i> handler in the generated HTML. You write
    this with this syntax: <tt>`{ expression }</tt>.
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}<ul>
  ~{list items: [1,2,3,4,5], var: 'i'}
   <li>
@@ -257,8 +269,8 @@ Total: ^{count}~{/noEval}~{/example}
  <div class="body">
   <h3>Inline</h3>
   <p>
-   Any <tt>script</tt> elements of type <tt>text/html</tt>, with the <tt>data-jstemplate</tt> 
-   attribute set to <tt>inline</tt> will be evaluated by JSTemplates and replaced inline:
+   Any <tt>script</tt> elements of type <tt>text/html</tt>, with the <tt>data-stamp</tt> 
+   attribute set to <tt>inline</tt> will be evaluated by Stamps and replaced inline:
   </p>
   <table class="example">
    <tr>
@@ -267,13 +279,13 @@ Total: ^{count}~{/noEval}~{/example}
    </tr>
    <tr>
    <td class="program">
-    <code><pre>&lt;script type="text/html" data-jstemplate="inline">
+    <code><pre>&lt;script type="text/html" data-stamp="inline">
  ^{new Date().toLocaleString()}
 &lt;/script>
 </pre></code>
    </td>
    <td class="result">
-    <script type="text/html" data-jstemplate="inline">
+    <script type="text/html" data-stamp="inline">
      ^{new Date().toLocaleString()}
     </script>
    </td>
@@ -296,13 +308,13 @@ Total: ^{count}~{/noEval}~{/example}
     <code><pre>&lt;script type="text/javascript">
 	// Those will replace the content of #output with the result of the template evaluation
 	// for a template reference
-	JSTemplates.loadTemplate("output", {id: "hello"}, /* optional */ {_arg: "World"});
+	Stamps.loadTemplate("output", {id: "hello"}, /* optional */ {_arg: "World"});
 	
 	// Or using the jQuery plugin:
-	jQuery("#output").jsTemplates({id: "hello"}, /* optional */ {_arg: "World"});
+	jQuery("#output").Stamps({id: "hello"}, /* optional */ {_arg: "World"});
 	
 	// Or if you just want the html:
-	var html = JSTemplates.applyTemplate("hello", /* optional */ {_arg: "World"});
+	var html = Stamps.applyTemplate("hello", /* optional */ {_arg: "World"});
 &lt;/script>
 </pre></code>
    </td>
@@ -311,7 +323,7 @@ Total: ^{count}~{/noEval}~{/example}
  </div>
 </div>
 
-<script name="doc" data-jstemplate="tag" type="text/html">
+<script name="doc" data-stamp="tag" type="text/html">
   <table class="doc">
    <tr class="tag">
     <th>Tag</th>
@@ -346,7 +358,7 @@ Total: ^{count}~{/noEval}~{/example}
 <div class="para">
  <h2 class="title">Predefined tags</h2>
  <div class="body">
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
     ~{doc tag: 'if', attribute: 'boolean expression', body: true}
      If the boolean expression evaluates to a <i>truish</i> value, the body of the tag is evaluated. Otherwise
      it is discarded. 
@@ -356,7 +368,7 @@ Total: ^{count}~{/noEval}~{/example}
   <p>
    Write conditionals with the <tt>if</tt> tag.
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}~{if 1 == 2}
  This is false.
 ~{/if}
@@ -367,7 +379,7 @@ Total: ^{count}~{/noEval}~{/example}
 ~{/noEval}~{/example}
   </script>
 
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
     ~{doc tag: 'else', body: true}
      If the previous <tt>if</tt> tag's boolean expression evaluates to a <i>false</i> value, the body of the 
      tag is evaluated. Otherwise it is discarded. 
@@ -377,7 +389,7 @@ Total: ^{count}~{/noEval}~{/example}
   <p>
    Optional tag to go with the <tt>if</tt> tag.
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}~{if 1 == 2}
  This is false.
 ~{/if}
@@ -394,7 +406,7 @@ Total: ^{count}~{/noEval}~{/example}
 ~{/noEval}~{/example}
   </script>
 
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
     ~{doc tag: 'list', 
           attributes: {items: 'An array expression to iterate', 
                        var: 'The name of the variable to hold each iterated item'}, 
@@ -408,7 +420,7 @@ Total: ^{count}~{/noEval}~{/example}
   <p>
    Iterate over arrays with the <tt>list</tt> tag.
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}<ul>
  ~{list items: ["blue","green","red"], 
         var: "color"}
@@ -417,7 +429,7 @@ Total: ^{count}~{/noEval}~{/example}
 </ul>~{/noEval}~{/example}
   </script>
 
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
     ~{doc tag: 'jQuery', 
           attributes: {selector: 'A jQuery selector to iterate', 
                        var: 'The name of the variable to hold each iterated item'}, 
@@ -432,7 +444,7 @@ Total: ^{count}~{/noEval}~{/example}
   <p>
    Iterate over jQuery selectors with the <tt>jQuery</tt> tag.
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}<ul>
  ~{jQuery selector: "h2", var: "header"}
   <li>^{header_index}: ^{header.text()}</li>
@@ -440,7 +452,7 @@ Total: ^{count}~{/noEval}~{/example}
 </ul>~{/noEval}~{/example}
   </script>
 
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
     ~{doc tag: 'timer', 
           attribute: 'an integer expression defining the number of milliseconds for each update', 
           body: true}
@@ -451,13 +463,13 @@ Total: ^{count}~{/noEval}~{/example}
   <p>
    Refresh parts of your document every <tt>X</tt> milliseconds with the <tt>timer</tt> tag.
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}~{timer 5000}
 ^{new Date().toLocaleString()}
 ~{/timer}~{/noEval}~{/example}
   </script>
 
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
     ~{doc tag: 'future', 
           attribute: 'an Future instance holding a reference to data that will become available asynchronously', 
           body: true}
@@ -473,9 +485,9 @@ Total: ^{count}~{/noEval}~{/example}
    load using AJAX, which means it's going to be asynchronous.
   </p>
   <p>
-   In JSTemplates we use <i>futures</i> to describe values that might or might not yet be defined 
+   In Stamps we use <i>futures</i> to describe values that might or might not yet be defined 
    (because they could arrive later via AJAX). When you pass the <tt>future</tt> tag a value which is 
-   an instance of the type <tt>JSTemplates.Future</tt>, the current template tag evaluation is delayed 
+   an instance of the type <tt>Stamps.Future</tt>, the current template tag evaluation is delayed 
    until the <i>future</i> instance is defined fully (when it receives its value from the network, 
    for instance), and the current template is <i>partially</i> evaluated, leaving gaps
    (actually, placeholders) where the template tags are waiting for <i>futures</i>.
@@ -491,9 +503,9 @@ Total: ^{count}~{/noEval}~{/example}
   <p>
    You can define a <i>future</i> which gets JSON data from an external source like this:
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{noEval}~{future 
-   value:new JSTemplates.Future("/Application/data"), 
+   value:new Stamps.Future("/data"), 
    var:'elements' }
  <ul>
  ~{list items: elements, var: 'v'}
@@ -503,7 +515,7 @@ Total: ^{count}~{/noEval}~{/example}
 ~{/future}~{/noEval}~{/example}
   </script>
 
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
     ~{doc tag: 'noEval', 
           body: true}
      Outputs the body with no JSTemplate interpretation. Use this if you want to output code that would
@@ -514,7 +526,7 @@ Total: ^{count}~{/noEval}~{/example}
   <p>
    Output non-evaluated template code with the <tt>noEval</tt> tag.
   </p>
-  <script data-jstemplate="inline" type="text/html">
+  <script data-stamp="inline" type="text/html">
    ~{example}~{openTag 'noEval'/}~{noEval}
 ^{new Date().toLocaleString()}
 ~{/noEval}~{closeTag 'noEval'/}~{/example}
@@ -527,7 +539,7 @@ Total: ^{count}~{/noEval}~{/example}
  <div class="body">
   <h3>Simple tags</h3>
   <p>
-   Define your simple tags with <tt>script</tt> elements of type <tt>text/html</tt>, the <tt>data-jstemplate</tt> 
+   Define your simple tags with <tt>script</tt> elements of type <tt>text/html</tt>, the <tt>data-stamp</tt> 
    attribute set to <tt>tag</tt> and the <tt>name</tt> attribute to set the name of the new simple tag.
   </p>
   <p>
@@ -541,7 +553,7 @@ Total: ^{count}~{/noEval}~{/example}
    </tr>
    <tr>
    <td class="program">
-    <code><pre>&lt;script type="text/html" data-jstemplate="tag" name="foo">
+    <code><pre>&lt;script type="text/html" data-stamp="tag" name="foo">
  Default argument: ^{_arg}&ltbr/>
  Named argument: ^{_item}&ltbr/>
  Body: ~{doBody/}
@@ -559,7 +571,7 @@ Total: ^{count}~{/noEval}~{/example}
   
   <h3>Programmatically</h3>
   <p>
-   You must define a subtype of <tt>JSTemplates.Tag</tt>, and register it in JSTemplates so it can find it:
+   You must define a subtype of <tt>Stamps.Tag</tt>, and register it in Stamps so it can find it:
   </p>
   <table class="example">
    <tr>
@@ -570,10 +582,10 @@ Total: ^{count}~{/noEval}~{/example}
     <code><pre>&lt;script type="text/javascript">
  // define our new tag type
  function HelloTag(name, attributes){
-	JSTemplates.Tag.apply(this, [name, attributes]);
+	Stamps.Tag.apply(this, [name, attributes]);
  }
- // make sure it inherits methods from JSTemplates.Tag
- JSTemplates.extend(HelloTag, JSTemplates.Tag);
+ // make sure it inherits methods from Stamps.Tag
+ Stamps.extend(HelloTag, Stamps.Tag);
 
  // and implement its behaviour
  HelloTag.prototype.outputInNewEnv = function(out, previousSibling, env){
@@ -584,8 +596,8 @@ Total: ^{count}~{/noEval}~{/example}
 	out('Hello ' + string);
  };
 
- // register this new tag in JSTemplates
- JSTemplates.declareTag('hello', HelloTag);
+ // register this new tag in Stamps
+ Stamps.declareTag('hello', HelloTag);
 &lt;/script>
 </pre></code>
    </td>
@@ -603,7 +615,7 @@ Total: ^{count}~{/noEval}~{/example}
    </tr>
    <tr>
    <td class="program">
-    <code><pre>&lt;link rel="jstemplates" href="/templates/my-tags.html" type="text/html" /></pre></code>
+    <code><pre>&lt;link rel="stamps" href="/templates/my-tags.html" type="text/html" /></pre></code>
    </td>
    </tr>
   </table>
@@ -613,11 +625,11 @@ Total: ^{count}~{/noEval}~{/example}
 <div class="para">
  <h2 class="title">API</h2>
  <div class="body">
-  <h3>Invoking functions when JSTemplates is ready</h3>
+  <h3>Invoking functions when Stamps is ready</h3>
   <p>
    Sometimes you need to invoke some code when all templates have been executed, and <tt>body.onload</tt> or
    <tt>jQuery(f)</tt> is not enough, but you can register your initialisation code with:
   </p>
-  <code><pre>JSTemplates.ready(function(){ alert('It is ready!'); });</pre></code>
+  <code><pre>Stamps.ready(function(){ alert('It is ready!'); });</pre></code>
  </div>
 </div>

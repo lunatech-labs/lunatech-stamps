@@ -1,4 +1,4 @@
-var JSTemplates = {};
+var Stamps = {};
 
 /*
  * TODO:
@@ -22,7 +22,7 @@ function log(d){
 var gensymCounter = 0;
 
 function gensym(){
-	return '__jstemplates_' + gensymCounter++;
+	return '__stamps_' + gensymCounter++;
 }
 
 //
@@ -40,7 +40,7 @@ function extend(SubType, ParentType){
 	SubType.prototype.constructor = constructor;
 }
 // make it public
-JSTemplates.extend = extend;
+Stamps.extend = extend;
 
 //
 // Code and expression types
@@ -66,9 +66,9 @@ Code.prototype.output = function(out, previousSibling, env){
 //
 // References
 
-var references = JSTemplates.references = {};
+var references = Stamps.references = {};
 
-JSTemplates.getReference = function (name){
+Stamps.getReference = function (name){
 	return references[name];
 }
 
@@ -83,7 +83,7 @@ Reference.prototype.output = function(out, previousSibling, env){
 	var refName = gensym();
 	references[refName] = val;
 	// and output code that can get to it
-	out("JSTemplates.getReference('"+refName+"')");
+	out("Stamps.getReference('"+refName+"')");
 };
 
 //
@@ -91,7 +91,7 @@ Reference.prototype.output = function(out, previousSibling, env){
 
 var declaredTags = {};
 
-var declareTag = JSTemplates.declareTag = function(name, constructor){
+var declareTag = Stamps.declareTag = function(name, constructor){
 	declaredTags[name] = constructor;
 }
 
@@ -112,7 +112,7 @@ function makeTagOrRef(name, attributes){
 //
 // Our base Tag type
 
-var Tag = JSTemplates.Tag = function(name, attributes){
+var Tag = Stamps.Tag = function(name, attributes){
 	this.name = name;
 	this.children = [];
 	this.attributes = attributes;
@@ -252,12 +252,12 @@ FutureTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 			v.listen(function(data){
 				// resume templates at that point
 				var target = jQuery("#"+substId);
-				target.removeClass("jstemplates-waiter");
+				target.removeClass("stamps-waiter");
 				tag.resumingFromFuture = data;
 				var html = evalTemplate(tag, clonedEnv);
 				target.replaceWith(html);
 			});
-			out("<span class='jstemplates-waiter' id='"+substId+"'>Loading...</span>");
+			out("<span class='stamps-waiter' id='"+substId+"'>Loading...</span>");
 		}
 	}else
 		this.outputBody(out, env, v);
@@ -296,7 +296,7 @@ TimerTag.prototype.outputInNewEnv = function(out, previousSibling, env){
 			lastHtml = newHtml;
 		}
 	}, delay);
-	out("<span class='jstemplates-timer' id='"+substId+"'>"+lastHtml+"</span>");
+	out("<span class='stamps-timer' id='"+substId+"'>"+lastHtml+"</span>");
 };
 
 TimerTag.prototype.evalBody = function(env){
@@ -434,7 +434,7 @@ var templates = {};
 var onready = [];
 var ready = false;
 
-JSTemplates.ready = function(f){
+Stamps.ready = function(f){
 	if(!ready)
 		onready.push(f);
 	else
@@ -445,11 +445,11 @@ JSTemplates.ready = function(f){
 // Functions
 
 // Procedural API
-JSTemplates.loadTemplate = function loadTemplate(id, params, env){
-	jQuery('#'+id).jsTemplates(params, env);
+Stamps.loadTemplate = function loadTemplate(id, params, env){
+	jQuery('#'+id).Stamps(params, env);
 }
 
-JSTemplates.applyTemplate = function (template, env){
+Stamps.applyTemplate = function (template, env){
 	var template = templates[template];
 	if(!template)
 		throw "Invalid template id: "+params.id;
@@ -457,7 +457,7 @@ JSTemplates.applyTemplate = function (template, env){
 }
 
 // jQuery plugin
-jQuery.fn.jsTemplates = function(params, env){
+jQuery.fn.Stamps = function(params, env){
 	var target = this;
 	if(params.url)
 		loadTemplateFromURL(target, params.url, env);
@@ -475,9 +475,9 @@ jQuery.fn.jsTemplates = function(params, env){
 jQuery(autoProcess);
 
 function autoProcess(){
-	log("jstemplates autoprocess 1");
+	log("stamps autoprocess 1");
 	// first load all automatic tags, if any
-	var autoTags = jQuery("link[rel=jstemplates]");
+	var autoTags = jQuery("link[rel=stamps]");
 	if(autoTags.size() == 0)
 		autoProcess2();
 	else{
@@ -504,11 +504,11 @@ function autoProcess(){
 }
 
 function autoProcess2(){
-	log("jstemplates autoprocess 2");
+	log("stamps autoprocess 2");
 	// we fist want to load all user tags
-	// data-jstemplate="tag" support
+	// data-stamp="tag" support
 	log("loading tag templates");
-	jQuery("[data-jstemplate=tag]").each(function(index, elem){
+	jQuery("[data-stamp=tag]").each(function(index, elem){
 		var $elem = jQuery(elem);
 		var name = $elem.attr('name');
 		if(!name)
@@ -557,9 +557,9 @@ function autoProcess2(){
 	});
 
 	// then define new templates by reference
-	// data-jstemplate="ref" support
+	// data-stamp="ref" support
 	log("loading ref templates");
-	jQuery("[data-jstemplate=ref]").each(function(index, elem){
+	jQuery("[data-stamp=ref]").each(function(index, elem){
 		var $elem = jQuery(elem);
 		var id = $elem.attr('id');
 		if(!id)
@@ -579,15 +579,15 @@ function autoProcess2(){
 	
 	// data-template="url" support
 	log("loading url templates");
-	jQuery("[data-jstemplate-url]").each(function(index, elem){
+	jQuery("[data-stamp-url]").each(function(index, elem){
 		var $elem = jQuery(elem);
-		var url = $elem.attr('data-jstemplate-url');
+		var url = $elem.attr('data-stamp-url');
 		loadTemplateFromURL($elem, url);
 	});
 
-	// data-jstemplate="inline" support
+	// data-stamp="inline" support
 	log("loading inline templates");
-	jQuery("[data-jstemplate=inline]").each(function(index, elem){
+	jQuery("[data-stamp=inline]").each(function(index, elem){
 		var $elem = jQuery(elem);
 		var data = $elem.html();
 		var html = processTemplates(data);
@@ -611,7 +611,7 @@ function loadTemplateFromURL(target, url, env){
 			target.html(html);
 		},
 		error: function(ouch){
-			alert(ouch);
+			alert("Failed to load template "+url);
 		}
 	});
 }
@@ -629,7 +629,7 @@ function processTemplates(text, env){
 	}
 }
 
-JSTemplates.__processTemplates = processTemplates;
+Stamps.__processTemplates = processTemplates;
 
 function parseTemplates(text){
 	log("parseTemplates1 for "+text.length+" characters");
@@ -951,10 +951,12 @@ function extendEnv(e, isExpr){
 	else if(isExpr) // this means we want to inject a value in a variable
 		body = "return function(e){ "+isExpr+" = e;};";
 	else
-		body = e+"; return function(e, isExpr){ return eval(extendEnv(e, isExpr)); }";
+		body = e+"; return function(e, isExpr){ return eval(Stamps.__extendEnv(e, isExpr)); }";
 	log("Eval: "+body);
 	return "(function(){ "+body+" })()"; 
 }
+// this is only there for google closure compiler to leave this symbol accessible :(
+Stamps.__extendEnv = extendEnv;
 
 //
 // The Futures API
@@ -968,13 +970,13 @@ function Future(url){
 			future.dataReady(data);
 		},
 		error: function(ouch){
-			alert(ouch);
+			alert("Failed to load future from "+url);
 		}
 	});
 }
 
 // make it public
-JSTemplates.Future = Future;
+Stamps.Future = Future;
 
 Future.prototype.dataReady = function(data){
 	// do we already have a receiver ?

@@ -3,7 +3,7 @@
  <script src="@{'/public/scripts/MD5.js'}" type="text/javascript" charset="utf-8"></script>
 #{/set}
 #{set 'moreStyles'}
- <link rel="stylesheet" href="/public/styles/facebook.css" type="text/css"/>
+ <link rel="stylesheet" href="/public/styles/stamps/facebook.css" type="text/css"/>
 #{/set}
 #{set title:'Home' /}
 
@@ -42,7 +42,7 @@ function doAddComment(id, link){
 		success: function(data){
 			atomize(data);
 			log(data);
-			var commentHtml = JSTemplates.applyTemplate("comment", {_arg: data});
+			var commentHtml = Stamps.applyTemplate("comment", {_arg: data});
 			jQuery("td.body .comment:last-child", status).before(commentHtml);
 			area.val('');
 		},
@@ -67,7 +67,7 @@ function doAddStatus(id, link){
 			log(update);
 			// make sure we don't add it if the refresh thread already added it
 			if(!loadedStatuses[update.id]){
-				var commentHtml = JSTemplates.applyTemplate("status", {_status: update, _author: globalAuthor});
+				var commentHtml = Stamps.applyTemplate("status", {_status: update, _author: globalAuthor});
 				$status.after(commentHtml);
 				loadedStatuses[update.id] = true;
 			}
@@ -116,7 +116,7 @@ function setupRefresh(id, link){
 				data.updates.forEach(function (status){
 					// only load if not already added (by ourselves)
 					if(!loadedStatuses[status.id]){
-						var statusHtml = JSTemplates.applyTemplate("status", {_status: status, _author: globalAuthor});
+						var statusHtml = Stamps.applyTemplate("status", {_status: status, _author: globalAuthor});
 						$status.after(statusHtml);
 						loadedStatuses[status.id] = true;
 					}
@@ -138,8 +138,8 @@ var globalAuthor;
 </script>
 
 <!-- Inline -->
-<script data-jstemplate="inline" type="text/html">
- ~{future value:new JSTemplates.Future("/Application/statusUpdates"), var:'statuses' }
+<script data-stamp="inline" type="text/html">
+ ~{future value:new Stamps.Future("/Application/statusUpdates"), var:'statuses' }
   !{ 
    // setup the actions
    atomize(statuses);
@@ -169,7 +169,7 @@ var globalAuthor;
  ~{/future}
 </script>
 
-<script name="status" data-jstemplate="tag" type="text/html">
+<script name="status" data-stamp="tag" type="text/html">
    <tr class="status" id="status-^{_status.id}">
     <td class="author-image">
      ~{gravatar _status.author.email /}
@@ -200,7 +200,7 @@ var globalAuthor;
    </tr> <!-- status -->
 </script>
 
-<script name="comment" data-jstemplate="tag" type="text/html">
+<script name="comment" data-stamp="tag" type="text/html">
  <tr class="comment" id="comment-^{_arg.id}">
   <td class="author-image">
    ~{gravatar _arg.author.email /}
@@ -216,7 +216,7 @@ var globalAuthor;
  </tr> <!-- comment -->
 </script>
 
-<script name="date" data-jstemplate="tag" type="text/html">
+<script name="date" data-stamp="tag" type="text/html">
  ~{timer 5000}
  !{
   var date = Math.round(new Date().setISO8601(_arg).getTime() / 1000);
@@ -243,6 +243,6 @@ var globalAuthor;
  ~{/timer}
 </script>
 
-<script name="gravatar" data-jstemplate="tag" type="text/html">
+<script name="gravatar" data-stamp="tag" type="text/html">
  <img src="http://www.gravatar.com/avatar/^{MD5(_arg.trim().toLowerCase())}"/>
 </script>

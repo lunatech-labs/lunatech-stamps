@@ -58,7 +58,7 @@ div {
  float: right;
  width: 15px;
  height: 15px;
- background: url(/public/styles/jstemplates/images/cross.png);
+ background: url(/public/styles/stamps/images/cross.png);
 }
 
 .remove:hover {
@@ -90,7 +90,7 @@ textarea {
  padding-bottom: 2px;
  padding-left: 20px;
  color: black;
- background: url(/public/styles/jstemplates/images/share.gif);
+ background: url(/public/styles/stamps/images/share.gif);
  background-position: 0 -15px;
  background-repeat: no-repeat;
 }
