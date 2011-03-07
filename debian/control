@@ -1,0 +1,11 @@
+Source: stamps
+Section: unknown
+Priority: extra
+Maintainer: Stephane Epardaud <stephane@epardaud.fr>
+Build-Depends: debhelper (>= 7), ant
+Standards-Version: 3.8.4
+
+Package: stamps
+Architecture: all
+Depends: ${misc:Depends}, play-1.1
+Description: Insert your description here

@@ -1,0 +1,3 @@
+etc/stamps/routes
+etc/stamps/log4j-prod.properties
+etc/stamps/application.conf
