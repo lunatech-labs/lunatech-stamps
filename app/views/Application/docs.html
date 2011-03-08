@@ -124,7 +124,7 @@
   
   <p>
    Add to that the fact that when doing AJAX, you always end up creating lots of HTML on the client using ad-hoc
-   means, most of the time either DOM manipulation or using jQuery, and that leads to ugly clumbsy code that is
+   means, most of the time either DOM manipulation or using jQuery, and that leads to ugly clumsy code that is
    hard to maintain. This is the exact reason why the servers switched from that sort of rendering to templating
    long ago, which is still largely unused on the client, unfortunately.
   </p>
@@ -177,7 +177,6 @@
    <td class="result">
     <script type="text/javascript">
      var template = jQuery("#ex^{example}").html();
-     console.log("got template" + template);
      var result = Stamps.__processTemplates(template);
      result = result.replace(/\n( *\n)+/g, "\n");
      jQuery("#ex^{example}-res").text(result);
