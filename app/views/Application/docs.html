@@ -39,16 +39,16 @@
         }
     }
     
-    window.onload = init;
+//    window.onload = init;
     function init(){
-        $(".toc, h1").css("position","fixed");
+        //$(".toc, h1").css("position","fixed");
         var h = location.hash.split("/")[1];
         if (h==undefined) {
             $(".toc li:first a").trigger('click');
         } else {
             $("#link-"+h).eq(0).trigger('click');
         }
-        adjustToc();
+//        adjustToc();
     }
     
 </script>
@@ -59,14 +59,30 @@
 
 <script data-stamp="inline" type="text/html">
  <div class="toc">
-  <ul>
-  ~{jQuery selector: ".para .title, h3", var: 'el'}
+  !{
+    var container;
+  }!
+  <ul class="primary">
+  ~{jQuery selector: ".para .title", var: 'el'}
    !{ 
      var t = el.text();
      var a = t.replace(/\?/gi,"").replace(/\s/gi,"-").toLowerCase();
      el.attr('id', a);
    }!
-   <li class="^{el.is('h3') ? 'level2': 'level1'}"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
+   <li class="level1"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
+  ~{/jQuery}
+  </ul>
+  <ul class="secondary">
+  ~{jQuery selector: ".para .title, h3", var: 'el'}
+   !{ 
+     var t = el.text();
+     var a = t.replace(/\?/gi,"").replace(/\s/gi,"-").toLowerCase();
+     el.attr('id', a);
+     if(!el.is('h3')) container = a;
+   }!
+   ~{if el.is('h3')}
+    <li class="^{'level2 '+container}"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
+   ~{/if}
   ~{/jQuery}
   </ul>
 
@@ -74,7 +90,6 @@
 </script>
 
 <h1>
- <a href="@{Application.docs}" class="product-name">Stamps<span>.js</span>*</a>
  <div class="tagline">*Client-side templates for an easy life</div>
  <a href="@{'/public/scripts/stamps.js'}">
   <button class="orange">
@@ -82,10 +97,10 @@
  	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.js').size().formatSize()}</span>
   </button>
  </a>
- <a href="@{'/public/scripts/stamps.min.js'}">
+ <a href="@{'/public/scripts/stamps.js'}">
   <button class="green">
  	Download (min)<br/>
- 	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.min.js').size().formatSize()}</span>
+ 	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.js').size().formatSize()}</span>
   </button>
  </a>
 </h1>

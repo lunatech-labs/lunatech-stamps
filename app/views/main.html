@@ -11,10 +11,53 @@
         <link rel="shortcut icon" type="image/png" href="@{'/public/styles/stamps/images/favicon.png'}">
         <script src="@{'/public/scripts/jquery.js'}" type="text/javascript" charset="utf-8"></script>
         <script src="@{'/public/scripts/date-iso8601.js'}" type="text/javascript" charset="utf-8"></script>
-        <script src="@{'/public/scripts/stamps.min.js'}" type="text/javascript" charset="utf-8"></script>
+        <script src="@{'/public/scripts/stamps.js'}" type="text/javascript" charset="utf-8"></script>
         #{get 'moreScripts' /}
+        <style>
+h1 {
+ position: relative;
+ display: inline-block;
+}
+.top {
+ color: white;
+ background: rgba(34, 34, 34, 0.949219);
+ width: 100%;
+}
+.menu {
+ display: inline-block;
+ font-weight: bold;
+}
+
+.menu li {
+ display: inline-block;
+ padding: 10px 10px;
+}
+.toc {
+ width: 100%;
+}
+.toc ul {
+ display: block;
+ padding: 0;
+ width: auto;
+}
+.toc ul li {
+ display: inline-block;
+ padding: 0;
+ width: auto;
+} 
+        </style>
     </head>
     <body>
+		<div class="top">
+		<h1>
+			<a href="@{Application.docs}" class="product-name">Stamps<span>.js</span>*</a>
+		</h1>
+        	<ul class="menu">
+        		<li>Home</li>
+        		<li>Documentation</li>
+        		<li>Contribute</li>
+        	</ul>
+		</div>
         <div id="site">
             #{doLayout /}
         </div>
