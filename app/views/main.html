@@ -18,13 +18,13 @@
     </head>
     <body>
 		<div class="top">
-		<h1>
-			<a href="@{Application.docs}" class="product-name">Stamps<span>.js</span>*</a>
-		</h1>
+			<h1>
+				<a href="@{Application.docs}" class="product-name">Stamps<span>.js</span>*</a>
+			</h1>
         	<ul class="menu">
-        		<li>Home</li>
-        		<li>Documentation</li>
-        		<li>Contribute</li>
+        		<li class="${page == 'Home' ? 'selected' : ''}"><a href="@{Application.index()}">Home</a></li>
+        		<li class="${page == 'Docs' ? 'selected' : ''}"><a href="@{Application.docs()}">Documentation</a></li>
+        		<li class="${page == 'Contrib' ? 'selected' : ''}"><a href="@{Application.contrib()}">Contribute</a></li>
         	</ul>
 		</div>
         <div id="site">
