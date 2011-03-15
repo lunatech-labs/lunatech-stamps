@@ -3,7 +3,6 @@
     date:       Fabruary 2011
     ########################################################################### */
     
-    @import "lib.less";
 
     #site { overflow: visible; } 
  
@@ -95,23 +94,24 @@
     
     .toc {
         position: fixed;
-        top: 39px;
+        top: 48px;
         z-index: 20;
         margin-bottom: 2em;
         .rounded-corners-bottom(@rad);
         padding-bottom: 1em;
         background: fadeout(@dark-color,5%);
         overflow: hidden;
-        width: 960px;
+        width: @max-width;
         }
      
     .toc > div {
         margin: 0;
-        padding: 0;
+        padding: 0 0 0 @block-space/2;
         }
 
     .toc > div.secondary {
-		text-align: right;
+		margin: 1em 0 0 0;
+		text-align: left;
         }
     
     

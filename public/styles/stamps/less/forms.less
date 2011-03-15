@@ -1,34 +1,44 @@
 /*  ###########################################################################
-    Author:     Lunatech
+    company:    DutchCelt Design
     date:       January 2011
     ########################################################################### */
 
-    
-    @import "lib.less";
-    
 
 /*  FORMS [WARNING! low specificity!]------------------------------------------ */
 
     form {
-        padding: 0 0 0.5em 0;
-        width: 100%;      
-        max-width: 500px;  
+        padding: 0 0 @em/2 0;
+        max-width: @form-width;  
         }
     fieldset {
-        padding: 0 0 0.5em 0;
+        padding: 0 0 @em/2 0;
         }
     label {
-        line-height: 2;
+        clear: left;
+        float: @label-orientation;
         display: block;
+        padding-right: @block-space/2;
+        width: @label-width;
+        text-align: @label-text-orientation;
         }
-    input{
-        width: 100%;
+    input[type=search],
+    input[type=url],
+    input[type=email],
+    input[type=text]{
+        float: @label-orientation;
+        width: @text-input-width;
+        }
+    input[type=number],
+    input[type^=date],
+    input[type=time] {
+        float: @label-orientation;
+        width: @text-input-width*0.325;
         }
     input[type=checkbox],
     input[type=radio]{
-        width: auto
+        width: auto;
         }
-    input[type=checkbox]+label {
+    input[type=checkbox] + label {
         float: none;
         display: inline;
         }
@@ -37,68 +47,39 @@
         float:none;
         }
     select {
-        margin: 0;
-        padding: 0;
+        float: @label-orientation;
         width: auto;
-        min-width: 50%;
+        min-width: @text-input-width*0.655;
         }
     textarea {
-        padding: 0.15em;
-        width: 100%;
+        float: @label-orientation;
+        width: @text-input-width;
         }
     input[type=checkbox] {
         float: left;
         }
-    div div input[type=checkbox] {
+    div > div > input[type=radio],
+    div > div > input[type=checkbox] {
         float: none;
         display: inline;
         }
-    fieldset div div div{
-        float: right;
-        display: block;
+    fieldset > div {
+        padding-bottom: @interline/1.5;
+        float: @label-orientation;
         width: 100%;
         }
-    fieldset div div label {
+    fieldset > div > div {
+        float: @label-orientation;
+        width: @text-input-width;
+        }
+    div > div > label {
         float: none;
         display: inline;
-        }
-    form fieldset p {
-        margin: 1em 0 1em 0;
         }
     input[type=button],
     input[type=submit] {
         width: auto;
         }
 
-    .hidden {
-        position: absolute;
-        visibility: hidden;
-        }
-    fieldset .error {
-        font-weight: bold;
-        color: @error;
-        }
-    
-/*  Errors 
-    span.required {
-        color: #900;
-        }
-
-    label.error {
-        position: static;
-        display: block;
-        float: none;
-        height: 2em;
-        color: #900;
-        }
-
-    input[type=radio] + label.error,
-    input[type=checkbox] + label.error {
-        float: left;
-        display: block;
-        clear: none;
-        width: auto;
-        padding: 0 0.5em;
-        color: #900;
-        }
-*/
+    select[multiple]{ width: @text-input-width*0.655; }
+        

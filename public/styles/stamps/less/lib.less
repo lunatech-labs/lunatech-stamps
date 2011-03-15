@@ -18,15 +18,27 @@
     @base-height:           @em;
     @base-width:            @grid-unit * 4;
     @block-space:           @base-width / 2;
-    @text-block-width:      @base-width * 11;
+    @text-block-width:      @base-width * 12;
+    @max-width:             @grid-unit*80;
     
     @line:                  1px;
-    @top:                   @line - (@line*2);
-    @bottom:                @line;
+    @ui-line:               1px;
+    @top:                   0 - @ui-line;
+    @bottom:                @ui-line;
     @rad:                   @grid-unit / 3;  // border radius setting
     
     
 //  Font elements -------------------------------------------------------------
+    
+    @font-face {
+        font-family: 'Virgo01Regular';
+        src: url('../fonts/virgo-webfont.eot?') format('eot'),
+             url('../fonts/virgo-webfont.woff') format('woff'),
+             url('../fonts/virgo-webfont.ttf') format('truetype'),
+             url('../fonts/virgo-webfont.svg#webfontU8Nja6QL') format('svg');
+        font-weight: normal;
+        font-style: normal;
+    }
 
     @font-scale:            82.5%;
     @transport:             1.6;
@@ -52,16 +64,9 @@
     
 //  Color sets ----------------------------------------------------------------
 
-    @grey0:                 #efefef;
-    
-    @grey1:                 darken(@grey0, 8%);
-    @grey2:                 darken(@grey0, 16%);
-    @grey3:                 darken(@grey0, 26%);
-    @grey4:                 darken(@grey0, 38%);
-    @grey5:                 darken(@grey0, 54%);
-    @grey6:                 darken(@grey0, 76%);
-    
-    @blue1:                 #7abcff;
+    @brand-color:           #7abcff;
+
+    @blue1:                 @brand-color;
     @blue2:                 darken(@blue1, 15%);
     @blue3:                 lighten(@blue1, 20%);
     
@@ -74,7 +79,19 @@
     @red1:                  #f83f21;
     @red2:                  darken(@red1, 15%);
     
+    @grey0:                 #efefef;                            @base-color:                @grey0;    
+    @grey1:                 darken(@grey0, 8%);                 @base-color1:               darken(@base-color, 8%);
+    @grey2:                 darken(@grey0, 16%);                @base-color2:               darken(@base-color, 16%);
+    @grey3:                 darken(@grey0, 26%);                @base-color3:               darken(@base-color, 26%);
+    @grey4:                 darken(@grey0, 38%);                @base-color4:               darken(@base-color, 38%);
+    @grey5:                 darken(@grey0, 54%);                @base-color5:               darken(@base-color, 54%);
+    @grey6:                 darken(@grey0, 76%);                @base-color6:               darken(@base-color, 76%);
+   
     @error:                 #cd0a0a;
+    
+    @ui-highlight1:         @yellow1;                           @ui-error1:                  @red1;
+    @ui-highlight2:         darken(@ui-highlight1, 25%);        @ui-error2:                  darken(@ui-error1, 15%);
+    @ui-highlight3:         darken(@ui-highlight2, 5%);         @ui-error3:                  darken(@ui-error2, 5%);
     
     
 //  Form elements -------------------------------------------------------------
@@ -83,6 +100,8 @@
     @field-width:           inherit;
     @label-width:           inherit;
     @text-input-width:      100%;
+    @label-orientation:     none; /* float value: left, right, none */
+    @label-text-orientation:left;
     
     
 //  Basic UI elements ---------------------------------------------------------
@@ -119,3 +138,17 @@
         -moz-border-radius-bottomright: @rad;
         border-bottom-right-radius: @rad;
     }
+    .columns(@col) {
+        -moz-column-count: @col; 
+        -moz-column-gap: @block-space; 
+        -webkit-column-count: @col; 
+        -webkit-column-gap: @block-space; 
+        column-count: @col; 
+        column-gap: @block-space; 
+        }
+    .borderbox {
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        -ms-box-sizing: border-box;
+        -box-sizing: border-box;
+        }

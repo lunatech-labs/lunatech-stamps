@@ -4,19 +4,8 @@
     ########################################################################### */
 
     
-    @import "lib.less";
     
         
-    @font-face {
-        font-family: 'Virgo01Regular';
-        src: url('../fonts/virgo-webfont.eot?') format('eot'),
-             url('../fonts/virgo-webfont.woff') format('woff'),
-             url('../fonts/virgo-webfont.ttf') format('truetype'),
-             url('../fonts/virgo-webfont.svg#webfontU8Nja6QL') format('svg');
-        font-weight: normal;
-        font-style: normal;
-    
-    }
 
     .jstemplates-waiter {
         background-image: url(../images/spinner.gif);
@@ -27,34 +16,30 @@
 
     #site {
         position: relative;
-        margin: 0 auto;
-        padding: 0 0 @base-height*2 0;
-        width: 960px;
+        margin: 124px auto 0;
+        padding: 0 0 @base-height*4 0;
+        width: @max-width;
         }
-    
-    .menu {
- display: inline-block;
- font-weight: bold;
- margin: 0;
- color: @light-color;
-}
 
-.menu li {
- display: inline-block;
- padding: 10px 10px;
-}
+
 
 	.top {
-		width: 100%;
-		background: fadeout(@dark-color,5%);
+	   position: fixed;
+	   top: 0;
+	   z-index: 42;
+	   float: none;
+	   width: 100%;
 	}
 
     .top h1 {
-        margin-top: 0;
+        position: relative;
+        margin: 0 auto -48px;
         line-height: 1;
         padding: 0 @block-space;
         color: @light-color;
-		float: left;
+		width: @max-width - @block-space*2;
+		height: 48px;
+		background: fadeout(@dark-color,5%);
         }
     .top h1 a {
         color: @light-color;
@@ -68,6 +53,8 @@
         color: orange;
         }
     h1 .tagline {
+        position: absolute;
+        left: @block-space;
         padding: 0 0 0 @block-space*2;
         font-size: 0.4em;
         }
@@ -132,16 +119,35 @@ button .info {
 	font-size: smaller;
 }
 
-	.menu li {
-		padding: 0;
-	}
+
+
+    .menu {
+        position: static;
+        display: block;
+        font-weight: bold;
+        margin: 0 auto;
+        padding: 0 0 0 600px;
+        color: @light-color;
+ 		width: @max-width - 600px;
+ 		height: @base-height*1.5;
+ 		overflow: hidden;
+       }
+    .menu li {
+        position: relative;
+        display: inline;
+        padding: 0 10px;
+        width: 100px;
+        }
+
+
     .menu li a {
+    	border-top: 3px solid transparent;
     	text-decoration: none;
     	color: @light-color;
     	display: inline-block;
     	cursor: pointer;
     	height: 100%;
-    	padding: 10px;
+    	padding: 5px 10px;
     	margin-right: 0;
     }
     
@@ -150,8 +156,8 @@ button .info {
     }
 
     .menu li.selected a {
-    	background: orange;
-    	color: @dark-color; 
+    	border-top: 3px solid orange;
+    	color: orange; 
     }
     
     a:visited,
