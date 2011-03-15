@@ -4,7 +4,7 @@
 #{set 'moreScripts'}
 <script type="text/javascript">
 
-    function hsf(){return $(".toc ul").height()+24}
+    function hsf(){return $(".toc").height()+39}
     
     function adjustToc(){
         var hs = hsf();
@@ -14,46 +14,51 @@
         $("#site").animate( { marginTop: hs+24 }, 'fast' );
     }
     function pageMe(h){
-        var l = $("#link-"+h);
-        var h = $("#"+h);
-        var p = h.closest(".para");
-        if(p.is(":hidden")) {
+        var $l = $("#link-"+h);
+        var $h = $("#"+h);
+        var $p = $h.closest(".para");
+        if($p.is(":hidden")) {
             $(".para").hide();
-            p.show();
+            $p.show();
         } 
         $(".active").removeClass("active");
-        h.addClass('active');
-        l.addClass('active');
-        $('html:not(:animated),body:not(:animated)').scrollTop((h.offset()).top - (hsf()+24));
-        slideToc(l);
+        $h.addClass('active');
+        $l.addClass('active');
+        if($l.closest("span").is(".level2"))
+	        $('html:not(:animated),body:not(:animated)').scrollTop(($h.offset()).top - hsf() - 5);
+        else
+	        slideToc(h);
     }
     
-    function slideToc(l){
-        var li = l.closest('li');
-        if(li.is(".level2")){
-            li.nextUntil(".level1").andSelf().slideDown();
-            li.prevUntil(".level1").andSelf().slideDown(function(){adjustToc()});
-        } else {
-            $(".level2:visible").slideUp();
-            li.nextUntil(".level1").slideDown(function(){adjustToc()});
-        }
+    function slideToc(h){
+    	console.log("slide toc");
+    	jQuery(".toc span.level2").hide();
+    	jQuery(".toc span."+h).show();
     }
     
-//    window.onload = init;
+    window.onload = init;
     function init(){
-        //$(".toc, h1").css("position","fixed");
         var h = location.hash.split("/")[1];
         if (h==undefined) {
-            $(".toc li:first a").trigger('click');
+            $(".toc .primary span:first a").trigger('click');
         } else {
             $("#link-"+h).eq(0).trigger('click');
         }
-//        adjustToc();
     }
     
 </script>
 #{/set}
 #{set 'moreStyles'}
+ <style>
+.top {
+	z-index: 20;
+	position: fixed;
+	top: 0;
+}
+#site {
+	margin-top: 100px !important;
+}
+ </style>
 #{/set}
 
 <script data-stamp="inline" type="text/html">
@@ -61,17 +66,17 @@
   !{
     var container;
   }!
-  <ul class="primary">
+  <div class="primary">
   ~{jQuery selector: ".para .title", var: 'el'}
    !{ 
      var t = el.text();
      var a = t.replace(/\?/gi,"").replace(/\s/gi,"-").toLowerCase();
      el.attr('id', a);
    }!
-   <li class="level1"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
+   <span class="level1"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></span>
   ~{/jQuery}
-  </ul>
-  <ul class="secondary">
+  </div>
+  <div class="secondary">
   ~{jQuery selector: ".para .title, h3", var: 'el'}
    !{ 
      var t = el.text();
