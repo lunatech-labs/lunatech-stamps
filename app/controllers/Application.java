@@ -42,6 +42,10 @@ public class Application extends Controller {
         render();
     }
 
+	public static void contrib() {
+        render();
+    }
+
     public static void data() throws InterruptedException{
     	Thread.sleep(1000);
     	List<String> data = new ArrayList<String>();
