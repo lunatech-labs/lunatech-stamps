@@ -85,97 +85,14 @@
      if(!el.is('h3')) container = a;
    }!
    ~{if el.is('h3')}
-    <li class="^{'level2 '+container}"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></li>
+    <span class="^{'level2 '+container}"><a href="#!/^{a}" id="link-^{a}" onclick="pageMe('^{a}')">^{t}</a></span>
    ~{/if}
   ~{/jQuery}
-  </ul>
+  </div>
 
  </div>
 </script>
 
-<h1>
- <div class="tagline">*Client-side templates for an easy life</div>
- <a href="@{'/public/scripts/stamps.js'}">
-  <button class="orange">
- 	Download<br/>
- 	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.js').size().formatSize()}</span>
-  </button>
- </a>
- <a href="@{'/public/scripts/stamps.js'}">
-  <button class="green">
- 	Download (min)<br/>
- 	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.js').size().formatSize()}</span>
-  </button>
- </a>
-</h1>
-
-<div class="para">
- <h2 class="title">What is Stamps?</h2>
- <div class="body">
-  <p>
-  Stamps is a client-side templating library similar to Play! Framework's server-side Groovy templates,
-  but on the client, in pure JavaScript.
-  </p>
-  
-  <h3>Why not user server-side templates?</h3>
-  
-  <p>
-   With server-side templates, you serve pages by loading data from the database, then produce HTML pages
-   using templates, then ship those pages to the client. This has the following drawbacks:
-  </p>
-  
-  <ul>
-   <li><p>
-     Template-processing uses CPU time which can impact scaling. On the other hand, the clients often have
-     multi-core CPUs doing nothing most of the time. We can distribute the cost of rendering pages to the clients.
-   </p></li>
-   <li><p>
-     Generating pages on the server increases the bandwidth necessary to serve pages, since we're sending a lot
-     of HTML that is generated from data we load from the database. If we can send the data directly to the client
-     and the client can generate the HTML, we can gain on bandwidth to serve the pages.
-   </p></li>
-   <li><p>
-     If you generate a list of items on the server using templates, it is hard to add elements to that list on
-     the client using AJAX, because the rendering logic is on the server, which means you have to duplicate it
-     on the client.
-   </p></li>
-  </ul>
-  
-  <p>
-   Add to that the fact that when doing AJAX, you always end up creating lots of HTML on the client using ad-hoc
-   means, most of the time either DOM manipulation or using jQuery, and that leads to ugly clumsy code that is
-   hard to maintain. This is the exact reason why the servers switched from that sort of rendering to templating
-   long ago, which is still largely unused on the client, unfortunately.
-  </p>
-
-  <h3>Why can client-side templates do for me?</h3>
-  
-  <p>
-   In addition to all the benefits we already discussed, client-side templates bring a number of unique features
-   that are not possible on server-side templates: 
-  </p>
-
-  <ul>
-   <li><p>
-    Template expressions and statements written in JavaScript, and not a dreadful sub-language such as UEL or
-    a third language such as Groovy (supposing the server is written in Java and the client in JavaScript).
-   </p></li>
-   <li><p>
-    The ability to introduce dynamic elements in the template, such as futures (parts of the template whose rendering
-    is delayed until a certain resource arrives from the server in the background) or timed updates (being able
-    to re-render parts of a template at specific time intervals), or even being able to use template evaluation-time
-    values at run-time (functions produced by the template, used in <i>onclick</i> handlers).
-   </p></li>
-   <li><p>
-    Define new template tags for new behaviour, either programatically for complex behaviour, or declaratively by
-    simply giving a name to a template part.
-   </p></li>
-   <li><p>
-    Apply templates on a page automatically, or by invoking an API for dynamic updates.
-   </p></li>
-  </ul>
- </div>
-</div>
 
 <script type="text/javascript">
  var example = 1;
