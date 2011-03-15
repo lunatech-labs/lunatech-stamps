@@ -27,6 +27,7 @@
         		<li class="${page == 'Contrib' ? 'selected' : ''}"><a href="@{Application.contrib()}">Contribute</a></li>
         	</ul>
 		</div>
+		#{get 'extra' /}
         <div id="site">
             #{doLayout /}
         </div>
