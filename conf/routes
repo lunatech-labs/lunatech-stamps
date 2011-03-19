@@ -4,13 +4,10 @@
 
 # Home page
 
-#{if play.Play.mode == play.Play.Mode.DEV}
-GET     /                                       Application.index
-#{/if}
-#{else}
-GET     /                                       Application.docs
-#{/else}
 
+GET		/										Application.index
+GET		/docs									Application.docs
+GET		/contrib								Application.contrib
 GET		/data									Application.data
 
 # Map static resources from the /app/public folder to the /public path
