@@ -1,3 +1,9 @@
+stamps (1.0.1) maverick; urgency=low
+
+  * Revamped web site with new pages
+
+ -- Stephane Epardaud <stephane@epardaud.fr>  Sat, 19 Mar 2011 18:25:08 +0100
+
 stamps (1.0) UNRELEASED; urgency=low
 
   * Initial release
