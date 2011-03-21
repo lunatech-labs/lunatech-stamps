@@ -9,13 +9,15 @@
 #{set 'extra'}
 <h1 id="subtitle">
  <div class="tagline">*Client-side templates for an easy life</div>
- <a href="@{'/public/scripts/stamps.js'}">
+ <a href="@{'/public/scripts/stamps.js'}" 
+    onClick="javascript: pageTracker._trackPageview('/downloads/stamps.js'); ">
   <button class="orange">
  	Download<br/>
  	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.js').size().formatSize()}</span>
   </button>
  </a>
- <a href="@{'/public/scripts/stamps.min.js'}">
+ <a href="@{'/public/scripts/stamps.min.js'}"
+    onClick="javascript: pageTracker._trackPageview('/downloads/stamps.min.js'); ">
   <button class="green">
  	Download (min)<br/>
  	<span class="info">Size: ${play.Play.getFile('/public/scripts/stamps.min.js').size().formatSize()}</span>
